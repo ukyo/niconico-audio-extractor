@@ -10,7 +10,9 @@ function extractAAC(){
                     name: tab.title + ".aac",
                     data: blob,
                     success: function(entry){
-                        location.href = entry.toURL();
+                        chrome.tabs.create({
+                            url: entry.toURL()
+                        });
                     }
                 })
             } else {

@@ -285,11 +285,12 @@ function Mp4(data){
 		this.blob = bb.getBlob();
 		this.cache.parse = this.parse();
 	} else if(isType(data, String)){
-		this.data = loadFileBuffer(data, function(bytes, offset, size){
-			self.complete = true;
-			bb.append(data);
+		loadFileBuffer(data, function(bytes, offset, size){
+			bb.append(bytes);
 			self.blob = bb.getBlob();
+			self.data = bytes;
 			self.cache.parse = self.parse();
+			self.complete = true;
 		});
 	}
 };
@@ -439,8 +440,8 @@ function loadFileBuffer(url, callback){
 			console.log('error');
 		},
 		complete: function(xhr){
-			console.log(typeof xhr.response);
-			//callback(xhr.response);
+			//console.log(xhr.response.byteLength);
+			callback(xhr.response);
 			hoge = xhr;
 		}
 	});
