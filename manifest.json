@@ -1,0 +1,15 @@
+{
+    "name": "NicoNico AAC Extractor",
+    "version": "0.1",
+    "description": "NicoNico AAC Extractor",
+    "icons": {
+        "48": "img/48.png",
+        "128": "img/128.png"
+    },
+    "background_page": "html/background.html",
+    "permissions": [
+        "http://*.nicovideo.jp/*",
+        "contextMenus",
+        "tabs"
+    ]
+}
