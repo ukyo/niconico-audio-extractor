@@ -422,32 +422,6 @@ function loadFileBuffer(url, callback){
 }
 */
 
-function loadFileBuffer(url, callback){
-	$.ajax({
-		type: "GET",
-		url: url,
-		beforeSend: function(xhr){
-			xhr.responseType = 'arraybuffer';
-		},
-		success: function(data){
-			//console.log(this.response);
-		},
-		error: function(xhr){
-			/*
-			if(xhr.response != null){
-				callback(xhr.response);
-			}*/
-			console.log('error');
-		},
-		complete: function(xhr){
-			//console.log(xhr.response.byteLength);
-			callback(xhr.response);
-			hoge = xhr;
-		}
-	});
-}
-
-
 return Mp4;
 
 })();
