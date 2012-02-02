@@ -160,8 +160,9 @@ var samplingRateTable = {
     }
 };
 
-/*
- * constructor
+
+/**
+ * @constructor
  */
 function Swf(bytes){
     this.bytes = bytes;
@@ -174,7 +175,7 @@ function Swf(bytes){
             offset = 8;
         
         offset += (zlibHeader[1] & 0x20) ? 6 : 2;
-        this.ui8arr = new Uint8Array(jsziptools._inflate(new Uint8Array(bytes, offset, bytes.byteLength - (4 + offset))));
+        this.ui8arr = new Uint8Array(jz.zlib.d(this.ui8arr.subarray(8)));
     } else {
         this.ui8arr = new Uint8Array(new Uint8Array(bytes).subarray(8));
     }
@@ -183,6 +184,7 @@ function Swf(bytes){
     bb.append(this.bytes);
     this.blob = bb.getBlob();
 }
+
 
 /*
  * instance methods
@@ -309,7 +311,7 @@ Swf.prototype = {
     }
 };
 
-/*
+/**
  * convert ArrayBuffer to String(ASCII only).
  */
 function bytesToString(bytes, offset, n){
