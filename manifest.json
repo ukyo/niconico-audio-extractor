@@ -10,6 +10,7 @@
     "permissions": [
         "http://*.nicovideo.jp/*",
         "contextMenus",
-        "tabs"
+        "tabs",
+        "notifications"
     ]
 }

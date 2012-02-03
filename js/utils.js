@@ -16,7 +16,7 @@ function loadFileBuffer(url, callback){
         complete: function(xhr){
             if(!isError) callback(xhr.response);
             else {
-                
+                throw 'Error: 403';
             }
         }
     });
