@@ -11,14 +11,8 @@
  */
 function extractAAC(buffer, title){
 	var mp4 = new Mp4(buffer);
-	fs.update({
-		size: 100 * 1024 * 1024,
-		name: title + ".aac",
-		data: mp4.extractAAC(),
-		success: function(entry){
-			downloadFile({url: entry.toURL('audio/aac'), filename: title + '.aac'});
-		}
-	});
+	var data = mp4.extractAAC();
+	downloadFile(data, title + ".aac");
 }
 
 
@@ -46,7 +40,8 @@ function extractMp3(buffer, title){
  * 
  * @param {Object} obj file's url and name.
  */
-function downloadFile(obj){
+function downloadFile(data, filename){
+	var obj = {url: webkitURL.createObjectURL(data), filename: filename};
 	chrome.tabs.create({url: "../html/dummy.html", selected: false}, function(tab){
 		chrome.tabs.sendRequest(tab.id, obj, function(response){
 			console.log(response);
