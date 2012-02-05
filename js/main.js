@@ -24,14 +24,8 @@ function extractAAC(buffer, title){
  */
 function extractMp3(buffer, title){
 	var swf = new Swf(buffer);
-	fs.update({
-		size: 1024 * 1024 * 1024,
-		name: title + ".mp3",
-		data: swf.extractMp3(),
-		success: function(entry){
-			downloadFile({url: entry.toURL('audio/mp3'), filename: title + '.mp3'});
-		}
-	});
+	var data = swf.extractMp3();
+	downloadFile(data, title + ".mp3");
 }
 
 
