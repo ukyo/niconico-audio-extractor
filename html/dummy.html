@@ -8,6 +8,6 @@ chrome.extension.onRequest.addListener(function(request, sender, sendResponse){
 	e.initEvent("click", true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
 	a.dispatchEvent(e);
 	sendResponse({});
-	setTimeout(window.close, 1000);
+	setTimeout(window.close, 10000);
 });
 </script>
