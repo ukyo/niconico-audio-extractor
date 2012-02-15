@@ -1,5 +1,5 @@
 /**
- * author: Syu Kato, ukyo.web@gmail.com, @ukyo
+ * Copyright 2012 (c) - Syu Kato <ukyo.web@gmail.com>
  */
 
 
@@ -67,16 +67,18 @@ function extractAudio(){
 		try{
 			loadFileBuffer(getMovieURL(tab.url), function(buffer){
 				try{
-					if(isSwf(tab.url.split("/").pop())) {
-						extractMp3From(buffer, tab.title);
+					var bytes = new Uint8Array(buffer), fn;
+					
+					if(bytes[0] === 70 && bytes[1] === 76 && bytes[2] === 86) {//FLV
+						fn = extractMp3FromFlv;
+					} else if(bytes[0] === 67 && bytes[1] === 87 && bytes[2] === 83) {//SWF
+						fn = extractMp3FromSwf;
+					} else if(bytes[4] === 102 && bytes[5] === 116 && bytes[6] === 121 && bytes[7] === 112) {//MP4
+						fn = extractAAC;
 					} else {
-						var bytes = new Uint8Array(buffer);
-						if(bytes[0] === 70 && bytes[1] === 76 && bytes[2] === 86) {// FLV
-							extractMp3FromFlv(buffer, tab.title);
-						} else {
-							extractAAC(buffer, tab.title);
-						}
+						throw 'unknown file type';
 					}
+					fn(buffer, tab.title);
 				} catch (e) {
 					onerror();
 				}
