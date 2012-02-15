@@ -4,7 +4,7 @@
 
 
 /**
- * Extract AAC from movie.
+ * Extract AAC from a movie.
  * 
  * @param {ArrayBuffer} buffer
  * @param {string} title
@@ -17,14 +17,27 @@ function extractAAC(buffer, title){
 
 
 /**
- * Extract mp3 from movie.
+ * Extract mp3 from a swf movie.
  * 
  * @param {ArrayBuffer} buffer
  * @param {string} title
  */
-function extractMp3(buffer, title){
+function extractMp3FromSwf(buffer, title){
 	var swf = new Swf(buffer);
 	var data = swf.extractMp3();
+	downloadFile(data, title + ".mp3");
+}
+
+
+/**
+ * Extract mp3 from a flv movie.
+ * 
+ * @param {ArrayBuffer} buffer
+ * @param {string} title
+ */
+function extractMp3FromFlv(buffer, title){
+	var flv = new Flv(buffer);
+	var data = flv.extractMp3();
 	downloadFile(data, title + ".mp3");
 }
 
@@ -54,7 +67,16 @@ function extractAudio(){
 		try{
 			loadFileBuffer(getMovieURL(tab.url), function(buffer){
 				try{
-					(isSwf(tab.url.split("/").pop()) ? extractMp3 : extractAAC)(buffer, tab.title);
+					if(isSwf(tab.url.split("/").pop())) {
+						extractMp3From(buffer, tab.title);
+					} else {
+						var bytes = new Uint8Array(buffer);
+						if(bytes[0] === 70 && bytes[1] === 76 && bytes[2] === 86) {// FLV
+							extractMp3FromFlv(buffer, tab.title);
+						} else {
+							extractAAC(buffer, tab.title);
+						}
+					}
 				} catch (e) {
 					onerror();
 				}
@@ -66,6 +88,10 @@ function extractAudio(){
 }
 
 
+/**
+ * When to extract audio is failed, this function will be called.
+ * This function displays a error message in notification.
+ */
 function onerror(){
 	var notification = createNotification("Nico Audio Extractor", "To extract was failed.");
 	notification.show();
@@ -83,7 +109,7 @@ function isSwf(id){
 
 
 /**
- * get a movie data url with nicovideo API.
+ * Get a URL of movie data with nicovideo API.
  * 
  * @param {string} pageURL
  * @return {string} 動画データのURL
