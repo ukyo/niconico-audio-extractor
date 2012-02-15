@@ -1,25 +1,17 @@
 function loadFileBuffer(url, callback){
-    var isError = false;
-    $.ajax({
-        type: "GET",
-        url: url,
-        beforeSend: function(xhr){
-            xhr.responseType = 'arraybuffer';
-            isError = false;
-        },
-        success: function(data){
-            
-        },
-        error: function(xhr){
-            if(xhr.status === 403) isError = true;
-        },
-        complete: function(xhr){
-            if(!isError) callback(xhr.response);
-            else {
-                throw 'Error: 403';
-            }
-        }
-    });
+	var xhr = new XMLHttpRequest();
+	xhr.open('GET', url);
+	xhr.responseType = 'arraybuffer';
+	xhr.onreadystatechange = function(){
+		if(xhr.readyState == 4) {
+			if(~~(xhr.status / 100) == 2) {
+				callback.call(xhr, xhr.response);
+			} else {
+				throw 'Error: ' + xhr.status;
+			}
+		}
+	};
+	xhr.send();
 }
 
 function createNotification(title, body){
