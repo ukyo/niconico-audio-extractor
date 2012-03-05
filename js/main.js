@@ -10,9 +10,11 @@
  * @param {string} title
  */
 function extractAAC(buffer, title){
-	var mp4 = new Mp4(buffer);
-	var data = mp4.extractAAC();
-	downloadFile(data, title + ".aac");
+	var parser = new mp4.Parser(buffer);
+	var aacBuff = parser.extractAACAsBlob();
+	// var bb = new WebKitBlobBuilder();
+	// bb.append(mp4.aacToM4a(aacBuff));
+	downloadFile(aacBuff, title + ".m4a");
 }
 
 
