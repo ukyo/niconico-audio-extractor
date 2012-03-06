@@ -10,11 +10,11 @@
  * @param {string} title
  */
 function extractAAC(buffer, title){
-	var parser = new mp4.Parser(buffer);
-	var aacBuff = parser.extractAACAsBlob();
-	// var bb = new WebKitBlobBuilder();
-	// bb.append(mp4.aacToM4a(aacBuff));
-	downloadFile(aacBuff, title + ".m4a");
+	var mp4 = new mp4js.Mp4(buffer);
+	var aacBuff = mp4.extractAACAsArrayBuffer();
+	var bb = new WebKitBlobBuilder();
+	bb.append(mp4js.aacToM4a(aacBuff));
+	downloadFile(bb.getBlob(), title + ".m4a");
 }
 
 
@@ -32,15 +32,24 @@ function extractMp3FromSwf(buffer, title){
 
 
 /**
- * Extract mp3 from a flv movie.
+ * Extract audio from a flv movie.
  * 
  * @param {ArrayBuffer} buffer
  * @param {string} title
  */
-function extractMp3FromFlv(buffer, title){
+function extractAudioFromFlv(buffer, title){
 	var flv = new Flv(buffer);
-	var data = flv.extractMp3();
-	downloadFile(data, title + ".mp3");
+	var data = flv.extractAudio();
+	var bb = new WebKitBlobBuilder();
+	if(data.type === "aac"){
+		bb.append(mp4js.aacToM4a(data.buffer));
+		//bb.append(data.buffer);
+		downloadFile(bb.getBlob(), title + ".m4a");
+	} else {
+		bb.append(data.buffer);
+		downloadFile(bb.getBlob(), title + data.type);
+	}
+	
 }
 
 
@@ -72,7 +81,7 @@ function extractAudio(){
 					var bytes = new Uint8Array(buffer), fn;
 					
 					if(bytes[0] === 70 && bytes[1] === 76 && bytes[2] === 86) {//FLV
-						fn = extractMp3FromFlv;
+						fn = extractAudioFromFlv;
 					} else if(bytes[0] === 67 && bytes[1] === 87 && bytes[2] === 83) {//SWF
 						fn = extractMp3FromSwf;
 					} else if(bytes[4] === 102 && bytes[5] === 116 && bytes[6] === 121 && bytes[7] === 112) {//MP4
