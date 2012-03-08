@@ -43,7 +43,7 @@ var TAG_TYPE_AUDIO = 0x08,
 		".?"
 	],
 	SOUND_RATE_TABLE = [
-		5500,
+		5512,
 		11025,
 		22050,
 		44100
@@ -205,18 +205,20 @@ Flv.prototype = {
 	wave: function(waveData, info) {
 		var header = new Uint8Array(44),
 			channels = SOUND_TYPE_TABLE[info.soundType],
-			sampleRate = SOUND_RATE_TABLE[info.soundRate];
+			sampleRate = SOUND_RATE_TABLE[info.soundRate],
+			sampleSize = SOUND_SIZE_TABLE[info.soundSize];
+		
 		putStr(header, "RIFF", 0);
-		putUi32le(header, waveData.length - 8, 4);
+		putUi32le(header, waveData.length + header.length - 8, 4);
 		putStr(header, "WAVE", 8);
 		putStr(header, "fmt ", 12);
-		putUi32le(header, 16, 16);
+		putUi32le(header, sampleSize, 16);
 		putUi16le(header, 1, 20);
 		putUi16le(header, channels, 22);
 		putUi32le(header, sampleRate, 24);
-		putUi32le(header, sampleRate * channels * 2, 28);
-		putUi16le(header, channels * 2, 32);
-		putUi16le(header, 16, 34);
+		putUi32le(header, sampleRate * channels * sampleSize / 8, 28);
+		putUi16le(header, channels * sampleSize / 8, 32);
+		putUi16le(header, sampleSize, 34);
 		putStr(header, "data", 36);
 		putUi32le(header, waveData.length, 40);
 		return {
@@ -257,7 +259,7 @@ Flv.prototype = {
 			}
 			offset += o.tags[i].bodyLength + 4;
 		}
-		return {type: "aac", buffer: concatByteArrays(byteArrays).buffer};
+		return {type: ".aac", buffer: concatByteArrays(byteArrays).buffer};
 	},
 	
 	/**
@@ -354,7 +356,7 @@ Flv.prototype = {
 	 * @return {number}
 	 */
 	ui32: function(offset){
-		return this.bytes[offset] << 24 | this.bytes[offset + 1] << 16 | this.bytes[offset + 2] << 8 | this.bytes[offset + 3];
+		return (this.bytes[offset] << 24 | this.bytes[offset + 1] << 16 | this.bytes[offset + 2] << 8 | this.bytes[offset + 3]) >>> 0;
 	},
 	
 	/**

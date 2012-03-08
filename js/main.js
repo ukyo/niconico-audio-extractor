@@ -2,6 +2,7 @@
  * Copyright 2012 (c) - Syu Kato <ukyo.web@gmail.com>
  */
 
+VIDEO_TITLE_POSTFIX = decodeURIComponent("%20%E2%80%90%20%E3%83%8B%E3%82%B3%E3%83%8B%E3%82%B3%E5%8B%95%E7%94%BB");
 
 /**
  * Extract AAC from a movie.
@@ -89,7 +90,9 @@ function extractAudio(){
 					} else {
 						throw 'unknown file type';
 					}
-					fn(buffer, tab.title);
+				
+					
+					fn(buffer, tab.title.split(VIDEO_TITLE_POSTFIX)[0]);
 				} catch (e) {
 					onerror();
 				}
@@ -165,6 +168,6 @@ function _showMenu(tab){
 	});
 }
 
-
+chrome.tabs.onCreated.addListener(_showMenu);
 chrome.tabs.onUpdated.addListener(showMenu);
 chrome.tabs.onSelectionChanged.addListener(showMenu)
