@@ -42,7 +42,7 @@ function extractAudioFromFlv(buffer, title){
 	var flv = new Flv(buffer);
 	var data = flv.extractAudio();
 	var bb = new WebKitBlobBuilder();
-	if(data.type === "aac"){
+	if(data.type === ".aac"){
 		bb.append(mp4js.aacToM4a(data.buffer));
 		//bb.append(data.buffer);
 		downloadFile(bb.getBlob(), title + ".m4a");
