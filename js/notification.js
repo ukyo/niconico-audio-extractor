@@ -16,6 +16,6 @@ function eventListener(port){
         }
     });
     chrome.extension.onConnect.removeListener(eventListener);
-};
+}
 
 chrome.extension.onConnect.addListener(eventListener);
