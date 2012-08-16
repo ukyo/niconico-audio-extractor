@@ -47,7 +47,7 @@ var tagdic = {
         return {
             label: 'ExportAssets',
             tags: tags
-        }
+        };
     },
     
     //ImportAssets
@@ -65,7 +65,7 @@ var tagdic = {
         return {
             label: 'ImportAssets',
             tags: tags
-        }
+        };
     },
     
     //FileAttributes
@@ -77,7 +77,7 @@ var tagdic = {
             hasMetadata: !!(b & 0x1F),
             actionScript3: !!(b & 0xF),
             useNetwork: !!(b & 1)
-        }
+        };
     },
     
     //SoundStreamHead
@@ -175,7 +175,7 @@ function Swf(bytes){
             offset = 8;
         
         offset += (zlibHeader[1] & 0x20) ? 6 : 2;
-        this.ui8arr = new Uint8Array(jz.zlib.d(this.ui8arr.subarray(8)));
+        this.ui8arr = new Uint8Array(jz.zlib.decompress(this.ui8arr.subarray(8)));
     } else {
         this.ui8arr = new Uint8Array(new Uint8Array(bytes).subarray(8));
     }
@@ -229,7 +229,7 @@ Swf.prototype = {
             frameRate: frameRate,
             frameCount: frameCount,
             byteLength: offset
-        }
+        };
     },
     
     readTags: function(){
@@ -256,17 +256,17 @@ Swf.prototype = {
     
     extractMp3: function(){
         var tags = this.readTags(),
-            bb = new BlobBuilder(),
-            i, n = tags.length, mp3Frames;
+            i, n = tags.length, mp3Frames,
+            arr = [];
         
         for(i = 0; i < n; ++i){
             if(tags[i].type === 19){
-                mp3Frames = tags[i].body.mp3Frames
-                bb.append(this.blob.slice(mp3Frames.offset, mp3Frames.offset + mp3Frames.length));
+                mp3Frames = tags[i].body.mp3Frames;
+                arr.push(this.ui8arr.subarray(mp3Frames.offset, mp3Frames.offset + mp3Frames.length));
             }
         }
         
-        return bb.getBlob();
+        return new Blob(arr);
     },
     
     _isCommpressed: function(){
@@ -275,22 +275,22 @@ Swf.prototype = {
     
     _isShortTag: function(offset){
         var tag = this.ui16(offset);
-        return (tag & 0x3F) !== 0x3F; 
+        return (tag & 0x3F) !== 0x3F;
     },
     
     _readShortTag: function(offset){
         var tag = this.ui16(offset);
         return {
             type: tag >> 6,
-            length: tag & 0x3F 
-        }
+            length: tag & 0x3F
+        };
     },
     
     _readLongTag: function(offset){
         return {
             type: this.ui16(offset) >> 6,
             length: this.ui32(offset + 2)
-        }
+        };
     },
     
     ui8: function(offset){
