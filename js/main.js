@@ -2,7 +2,7 @@
  * Copyright 2012 (c) - Syu Kato <ukyo.web@gmail.com>
  */
 
-VIDEO_TITLE_POSTFIX = decodeURIComponent("%20%E2%80%90%20%E3%83%8B%E3%82%B3%E3%83%8B%E3%82%B3%E5%8B%95%E7%94%BB");
+VIDEO_TITLE_SAFIX = decodeURIComponent("%20%E2%80%90%20%E3%83%8B%E3%82%B3%E3%83%8B%E3%82%B3%E5%8B%95%E7%94%BB");
 
 /**
  * Extract AAC from a movie.
@@ -13,9 +13,7 @@ VIDEO_TITLE_POSTFIX = decodeURIComponent("%20%E2%80%90%20%E3%83%8B%E3%82%B3%E3%8
 function extractAAC(buffer, title){
 	var mp4 = new mp4js.Mp4(buffer);
 	var aacBuff = mp4.extractAACAsArrayBuffer();
-	var bb = new WebKitBlobBuilder();
-	bb.append(mp4js.aacToM4a(aacBuff));
-	downloadFile(bb.getBlob(), title + ".m4a");
+	downloadFile(new Blob([new Uint8Array(mp4js.aacToM4a(aacBuff))]), title + ".m4a");
 }
 
 
@@ -41,14 +39,10 @@ function extractMp3FromSwf(buffer, title){
 function extractAudioFromFlv(buffer, title){
 	var flv = new Flv(buffer);
 	var data = flv.extractAudio();
-	var bb = new WebKitBlobBuilder();
 	if(data.type === ".aac"){
-		bb.append(mp4js.aacToM4a(data.buffer));
-		//bb.append(data.buffer);
-		downloadFile(bb.getBlob(), title + ".m4a");
+		downloadFile(new Blob([mp4js.aacToM4a(data.buffer)]), title + ".m4a");
 	} else {
-		bb.append(data.buffer);
-		downloadFile(bb.getBlob(), title + data.type);
+		downloadFile(new Blob([new Uint8Array(data.buffer)]), title + data.type);
 	}
 	
 }
@@ -92,7 +86,7 @@ function extractAudio(){
 					}
 				
 					
-					fn(buffer, tab.title.split(VIDEO_TITLE_POSTFIX)[0]);
+					fn(buffer, tab.title.split(VIDEO_TITLE_SAFIX)[0]);
 				} catch (e) {
 					onerror();
 				}
