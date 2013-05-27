@@ -1,0 +1,9 @@
+[submodule "vendor/zlib.js"]
+	path = vendor/zlib.js
+	url = git://github.com/imaya/zlib.js.git
+[submodule "vendor/mp4.js"]
+	path = vendor/mp4.js
+	url = git://github.com/ukyo/mp4.js.git
+[submodule "vendor/q"]
+	path = vendor/q
+	url = git://github.com/kriskowal/q.git
