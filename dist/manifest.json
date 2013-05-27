@@ -13,14 +13,14 @@
     "page_action": {
         "default_icon": {
             "19": "img/19.png",
-            "38": "img/48.png"
+            "38": "img/19.png"
         },
         "default_title": "niconico audio extractor",
         "default_popup": "html/page.html"
     },
     "permissions": [
         "http://*.nicovideo.jp/*",
-        "tabs",
-        "notifications"
-    ]
+        "tabs"
+    ],
+    "update_url": "https://github.com/ukyo/niconico-audio-extractor"
 }
