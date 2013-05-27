@@ -1,0 +1,59 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>page action</title>
+  <style type="text/css">
+    html, body {
+      padding: 0;
+      margin: 0;
+    }
+
+    body {
+      padding: 3px 0;
+      color: #494949;
+      font-size: 12px;
+      width: 160px;
+    }
+
+    .item {
+      padding: 3px;
+      cursor: pointer;
+    }
+
+    .item:hover {
+      background-color: #eee;
+    }
+
+    .icon {
+      width: 16px;
+      height: 16px;
+      float: left;
+      margin-left: 3px;
+      margin-right: 8px;
+    }
+
+    .audio {
+      background-image: url(/img/audio.png);
+    }
+
+    .movie {
+      background-image: url(/img/video.png);
+    }
+
+  </style>
+  <script src="/js/vendor/q/q.min.js"></script>
+  <script src="/js/src/settings.js"></script>
+  <script src="/js/src/page.js"></script>
+</head>
+<body>
+  <div id="movie" class="item">
+    <div class="icon movie"></div>
+    <div class="text">Download Movie</div>
+  </div>
+  <div id="audio" class="item">
+    <div class="icon audio"></div>
+    <div class="text">Download Audio</div>
+  </div>
+</body>
+</html>
