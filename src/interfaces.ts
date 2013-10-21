@@ -9,7 +9,7 @@ interface IDownloadParams {
   pageTitle: string;
   xhrSuccess(movie: Uint8Array): Uint8Array;
   xhrFail(err: ErrorEvent): ErrorEvent;
-  xhrProgress(ev: ProgressEvent);
+  xhrProgress(ev: ProgressEvent): ProgressEvent;
 }
 
 interface ITabInfo {
