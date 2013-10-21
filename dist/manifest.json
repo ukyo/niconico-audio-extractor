@@ -22,5 +22,6 @@
         "http://*.nicovideo.jp/*",
         "tabs"
     ],
+    "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
     "update_url": "https://github.com/ukyo/niconico-audio-extractor"
 }
