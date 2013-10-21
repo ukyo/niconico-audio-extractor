@@ -3,10 +3,10 @@
 module Background {
 
   // get a raw movie url with nicovideo api.
-  var getMovieURL = (pageUrl: string): Qpromise => {
-    var id = pageUrl.split('/').pop();
+  var getMovieURL = (pageUrl: string): Q.Promise<string> => {
+    var id = pageUrl.split('?')[0].split('/').pop();
     var xhr = new XMLHttpRequest;
-    var d = Q.defer();
+    var d = Q.defer<string>();
 
     xhr.open('GET', 'http://flapi.nicovideo.jp/api/getflv/' + id + (/^nm/.test(id) ? '?as3=1' : ''));
     xhr.send();
@@ -19,7 +19,7 @@ module Background {
 
 
   // load movie as Uint8Array.
-  var loadMovie = (movieUrl: string): Qpromise => {
+  var loadMovie = (movieUrl: string): Q.Promise<Uint8Array> => {
     var xhr = new XMLHttpRequest;
     var d = Q.defer();
 
@@ -83,12 +83,12 @@ module Background {
     return media;
   };
 
-
   // get a movie data from nicovideo.
-  export var getMovie = (params: IDownloadParams): Qpromise => {
+  export var getMovie = (params: IDownloadParams): Q.Promise<IMedia> => {
     return getMovieURL(params.pageUrl)
-    .then(movie => loadMovie(movie).then(params.xhrSuccess, params.xhrFail, params.xhrProgress))
-    .then(movie => {
+    .then(loadMovie)
+    .then(params.xhrSuccess, params.xhrFail, params.xhrProgress)
+    .then((movie: Uint8Array) => {
       var type: string;
       var d = Q.defer();
 
@@ -105,10 +105,11 @@ module Background {
 
 
   // get a audio data from nicovideo.
-  export var getAudio = (params: IDownloadParams): Qpromise => {
+  export var getAudio = (params: IDownloadParams): Q.Promise<IMedia> => {
     return getMovieURL(params.pageUrl)
-    .then(movie => loadMovie(movie).then(params.xhrSuccess, params.xhrFail, params.xhrProgress))
-    .then(movie => {
+    .then(loadMovie)
+    .then(params.xhrSuccess, params.xhrFail, params.xhrProgress)
+    .then((movie: Uint8Array) => {
       var media = extractAudio(movie);
       var d = Q.defer();
       media.name = params.pageTitle.split(Settings.VIDEO_TITLE_SAFIX)[0];
