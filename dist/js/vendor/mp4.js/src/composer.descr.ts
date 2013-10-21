@@ -1,8 +1,8 @@
 /// <reference path="mp4.ts" />
 
-module Mp4.Composer {
+module Mp4.Builder {
 
-  export class DescriptorComposerMixin extends BaseComposer {
+  export class DescriptorBuilderMixin extends BaseBuilder {
     writeDescriptor(descr) {
       var bytes: Uint8Array;
       if (descr instanceof Uint8Array) {
@@ -10,23 +10,23 @@ module Mp4.Composer {
       } else if (descr.bytes) {
         bytes = descr.bytes;
       } else {
-        bytes = createDescriptorComposer(descr).compose();
+        bytes = createDescriptorBuilder(descr).build();
       }
       this.writeBytes(bytes);
     }
   }
 
 
-  export class DescriptorComposer extends DescriptorComposerMixin {
+  export class DescriptorBuilder extends DescriptorBuilderMixin {
     constructor() {
       super();
       this.writeUint8(this['constructor'].TAG);
       this.writeBytes(new Uint8Array(4));
     }
 
-    compose(): Uint8Array {
+    build(): Uint8Array {
       this.writeBodyLength();
-      return super.compose();
+      return super.build();
     }
 
     private writeBodyLength() {
@@ -42,7 +42,7 @@ module Mp4.Composer {
   }
 
 
-  export class DecoderConfigDescriptorComposer extends DescriptorComposer {
+  export class DecoderConfigDescriptorBuilder extends DescriptorBuilder {
     static TAG = DESCR_TAG_DECODER_CONFIG_DESCRIPTOR;
 
     constructor(descr: IDecoderConfigDescriptor) {
@@ -66,7 +66,7 @@ module Mp4.Composer {
   }
 
 
-  export class SLConfigDescriptorComposer extends DescriptorComposer {
+  export class SLConfigDescriptorBuilder extends DescriptorBuilder {
     static TAG = DESCR_TAG_SL_CONFIG_DESCRIPTOR;
 
     constructor(descr: ISLConfigDescriptor) {
@@ -106,7 +106,7 @@ module Mp4.Composer {
   }
 
 
-  export class DecoderSpecificInfoComposer extends DescriptorComposer {
+  export class DecoderSpecificInfoBuilder extends DescriptorBuilder {
     static TAG = DESCR_TAG_DECODER_SPECIFIC_INFO;
 
     constructor(descr: IDecoderSpecificInfo) {
@@ -116,7 +116,7 @@ module Mp4.Composer {
   }
 
 
-  export class ESDescriptorComposer extends DescriptorComposer {
+  export class ESDescriptorBuilder extends DescriptorBuilder {
     static TAG = DESCR_TAG_ES_DESCRIPTOR;
 
     constructor(descr: IESDescriptor) {
@@ -143,15 +143,15 @@ module Mp4.Composer {
     }
   }
 
-  export var createDescriptorComposer = (descr: IDescriptor): DescriptorComposer => {
-    var _Composer;
-    Object.keys(Composer).some(key => {
-      if (Composer[key].TAG === descr.tag) {
-        _Composer = Composer[key];
+  export var createDescriptorBuilder = (descr: IDescriptor): DescriptorBuilder => {
+    var _Builder;
+    Object.keys(Builder).some(key => {
+      if (Builder[key].TAG === descr.tag) {
+        _Builder = Builder[key];
         return true;
       }
     });
-    return new (_Composer || DescriptorComposer)(descr);
+    return new (_Builder || DescriptorBuilder)(descr);
   };
 
 }

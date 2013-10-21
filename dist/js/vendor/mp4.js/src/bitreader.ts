@@ -20,7 +20,7 @@ module Mp4 {
     view: DataView2;
     bitOffset = 0;
 
-    constructor(public bytes: Uint8Array, public littleEndian: bool = false) {
+    constructor(public bytes: Uint8Array, public littleEndian: boolean = false) {
       this.view = new DataView2(bytes);
     }
 
@@ -161,7 +161,7 @@ module Mp4 {
       return this.bitOffset >>> 3;
     }
 
-    eof(): bool {
+    eof(): boolean {
       return this.bitOffset / 8 >= this.bytes.length;
     }
   }

@@ -7,7 +7,7 @@ module Mp4 {
     bitOffset = 0;
     bytes = new Uint8Array(2);
 
-    constructor(public littleEndian: bool = false) {
+    constructor(public littleEndian: boolean = false) {
       this.view = new DataView2(this.bytes);
     }
 

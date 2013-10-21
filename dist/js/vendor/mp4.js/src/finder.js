@@ -7,29 +7,26 @@ var Mp4;
         Finder.prototype.findOne = function (type) {
             var box;
             var find = function (tree) {
-                if(box) {
+                if (box)
                     return;
-                }
-                switch(typeof tree) {
+                switch (typeof tree) {
                     case 'number':
                     case 'string':
                     case 'boolean':
                         return;
                 }
-                if(tree.type === type) {
+                if (tree.type === type) {
                     return box = tree;
                 }
-                if(tree.buffer) {
+                if (tree.buffer)
                     return;
-                }
                 Object.keys(tree).forEach(function (key) {
                     var prop = tree[key];
-                    if(prop == null) {
+                    if (prop == null)
                         return;
-                    }
-                    if(Array.isArray(prop)) {
+                    if (Array.isArray(prop)) {
                         prop.some(find);
-                    } else if(prop.type) {
+                    } else if (prop.type) {
                         find(prop);
                     }
                 });
@@ -37,27 +34,25 @@ var Mp4;
             find(this.tree);
             return box;
         };
+
         Finder.prototype.findAll = function (type) {
             var boxes = [];
             var find = function (tree) {
-                switch(typeof tree) {
+                switch (typeof tree) {
                     case 'number':
                     case 'string':
                     case 'boolean':
                         return;
                 }
-                if(tree.type === type) {
+                if (tree.type === type)
                     boxes.push(tree);
-                }
-                if(tree.buffer) {
+                if (tree.buffer)
                     return;
-                }
                 Object.keys(tree).forEach(function (key) {
                     var prop = tree[key];
-                    if(prop == null) {
+                    if (prop == null)
                         return;
-                    }
-                    if(Array.isArray(prop)) {
+                    if (Array.isArray(prop)) {
                         prop.forEach(find);
                     } else {
                         find(prop);
@@ -69,6 +64,6 @@ var Mp4;
         };
         return Finder;
     })();
-    Mp4.Finder = Finder;    
+    Mp4.Finder = Finder;
 })(Mp4 || (Mp4 = {}));
-//@ sourceMappingURL=finder.js.map
+//# sourceMappingURL=finder.js.map

@@ -43,11 +43,11 @@ module Mp4 {
           case '[object Float32Array]':
           case '[object Float64Array]':
           case '[object DataView]':
-            if (byteOffset === void 0 && byteLength === void 0) {
+            if (byteOffset === undefined && byteLength === undefined) {
               this.view = new DataView(buffer.buffer, buffer.byteOffset, buffer.byteLength);
-            } else if (byteOffset !== void 0 && byteLength === void 0) {
+            } else if (byteOffset !== undefined && byteLength === undefined) {
               this.view = new DataView(buffer.buffer, buffer.byteOffset + byteOffset);
-            } else if (byteOffset === void 0 && byteLength !== void 0) {
+            } else if (byteOffset === undefined && byteLength !== undefined) {
               this.view = new DataView(buffer.buffer, buffer.byteOffset, byteLength);
             } else {
               this.view = new DataView(buffer.buffer, byteOffset, byteLength);
@@ -78,51 +78,51 @@ module Mp4 {
       this.view.setInt8(byteOffset, value);
     }
 
-    getUint16(byteOffset: number, littleEndian: bool = false): number {
+    getUint16(byteOffset: number, littleEndian: boolean = false): number {
       return this.view.getUint16(byteOffset, littleEndian);
     }
 
-    setUint16(byteOffset: number, value: number, littleEndian: bool = false) {
+    setUint16(byteOffset: number, value: number, littleEndian: boolean = false) {
       this.view.setUint16(byteOffset, value, littleEndian);
     }
 
-    getInt16(byteOffset: number, littleEndian: bool = false): number {
+    getInt16(byteOffset: number, littleEndian: boolean = false): number {
       return this.view.getInt16(byteOffset, littleEndian);
     }
 
-    setInt16(byteOffset: number, value: number, littleEndian: bool = false) {
+    setInt16(byteOffset: number, value: number, littleEndian: boolean = false) {
       this.view.setInt16(byteOffset, value, littleEndian);
     }
 
-    getUint32(byteOffset: number, littleEndian: bool = false): number {
+    getUint32(byteOffset: number, littleEndian: boolean = false): number {
       return this.view.getUint32(byteOffset, littleEndian);
     }
 
-    setUint32(byteOffset: number, value: number, littleEndian: bool = false) {
+    setUint32(byteOffset: number, value: number, littleEndian: boolean = false) {
       this.view.setUint32(byteOffset, value, littleEndian);
     }
 
-    getInt32(byteOffset: number, littleEndian: bool = false): number {
+    getInt32(byteOffset: number, littleEndian: boolean = false): number {
       return this.view.getInt32(byteOffset, littleEndian);
     }
 
-    setInt32(byteOffset: number, value: number, littleEndian: bool = false) {
+    setInt32(byteOffset: number, value: number, littleEndian: boolean = false) {
       this.view.setInt32(byteOffset, value, littleEndian);
     }
 
-    getFloat32(byteOffset: number, littleEndian: bool = false): number {
+    getFloat32(byteOffset: number, littleEndian: boolean = false): number {
       return this.view.getFloat32(byteOffset, littleEndian);
     }
 
-    setFloat32(byteOffset: number, value: number, littleEndian: bool = false) {
+    setFloat32(byteOffset: number, value: number, littleEndian: boolean = false) {
       this.view.setFloat32(byteOffset, value, littleEndian);
     }
 
-    getFloat64(byteOffset: number, littleEndian: bool = false): number {
+    getFloat64(byteOffset: number, littleEndian: boolean = false): number {
       return this.view.getFloat64(byteOffset, littleEndian);
     }
 
-    setFloat64(byteOffset: number, value: number, littleEndian: bool = false) {
+    setFloat64(byteOffset: number, value: number, littleEndian: boolean = false) {
       this.view.setFloat64(byteOffset, value, littleEndian);
     }
 
@@ -219,12 +219,12 @@ module Mp4 {
       return UTF8Bytes.length;
     }
 
-    getUint24(byteOffset: number, littleEndian: bool = false): number {
+    getUint24(byteOffset: number, littleEndian: boolean = false): number {
       var b = new Uint8Array(this.buffer, this.byteOffset + byteOffset);
       return littleEndian ? (b[0] | (b[1] << 8) | (b[2] << 16)) : (b[2] | (b[1] << 8) | (b[0] << 16));
     }
 
-    setUint24(byteOffset: number, value: number, littleEndian: bool = false) {
+    setUint24(byteOffset: number, value: number, littleEndian: boolean = false) {
       var b = new Uint8Array(this.buffer, this.byteOffset + byteOffset);
       if(littleEndian) {
         b[0] = value & 0xFF;
@@ -237,12 +237,12 @@ module Mp4 {
       }
     }
 
-    getInt24(byteOffset: number, littleEndian: bool = false): number {
+    getInt24(byteOffset: number, littleEndian: boolean = false): number {
       var v = this.getUint24(byteOffset, littleEndian);
       return v & 0x800000 ? v - 0x1000000 : v;
     }
 
-    setInt24(byteOffset: number, value: number, littleEndian: bool = false) {
+    setInt24(byteOffset: number, value: number, littleEndian: boolean = false) {
       this.setUint24(byteOffset, value, littleEndian);
     }
   }

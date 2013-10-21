@@ -1,9 +1,9 @@
 /// <reference path="mp4.ts" />
 
-module Mp4.Composer {
+module Mp4.Builder {
 
-  export class BaseComposer extends BitWriter {
-    compose(): Uint8Array {
+  export class BaseBuilder extends BitWriter {
+    build(): Uint8Array {
       return this.data;
     }
   }

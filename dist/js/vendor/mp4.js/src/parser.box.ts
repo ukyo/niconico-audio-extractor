@@ -728,10 +728,10 @@ module Mp4.Parser {
       ret.samples = [];
       for (var i = 0; i < sampleCount; ++i) {
         ret.samples.push({
-          sampleDuration: (ret.flags & 0x000100) ? this.readUint32() : void 0,
-          sampleSize: (ret.flags & 0x000200) ? this.readUint32() : void 0,
-          sampleFlags: (ret.flags & 0x000400) ? this.readUint32() : void 0,
-          sampleCompositionTimeOffset: (ret.flags & 0x000800) ? this.readUint32() : void 0
+          sampleDuration: (ret.flags & 0x000100) ? this.readUint32() : undefined,
+          sampleSize: (ret.flags & 0x000200) ? this.readUint32() : undefined,
+          sampleFlags: (ret.flags & 0x000400) ? this.readUint32() : undefined,
+          sampleCompositionTimeOffset: (ret.flags & 0x000800) ? this.readUint32() : undefined
         });
       }
       return ret;

@@ -54,7 +54,10 @@ module Mp4 {
     var finder = new Finder(tree);
     finder.findAll(BOX_TYPE_TRACK_BOX).some(box => {
       var hdlr = <IHandlerBox>new Finder(box).findOne(BOX_TYPE_HANDLER_BOX);
-      if (hdlr.handlerType === 'soun') return audioTrack = <ITrackBox>box;
+      if (hdlr.handlerType === 'soun') {
+        audioTrack = <ITrackBox>box;
+        return true;
+      }
     });
     return audioTrack;
   };
@@ -84,7 +87,7 @@ module Mp4 {
       compatibleBrands: ['isom', 'M4A ', 'mp42']
     };
 
-    ftyp.bytes = new Composer.FileTypeBoxComposer(ftyp).compose();
+    ftyp.bytes = new Builder.FileTypeBoxBuilder(ftyp).build();
     offset += ftyp.bytes.length;
 
     var mvhd = finder.findOne(BOX_TYPE_MOVIE_HEADER_BOX);
@@ -121,19 +124,19 @@ module Mp4 {
       offset += chunks[i - 1].length;
       chunkOffsets[i] = offset;
     }
-    stcoBytes = new Composer.ChunkOffsetBoxComposer({
+    stcoBytes = new Builder.ChunkOffsetBoxBuilder({
       entryCount: stco.entryCount,
       chunkOffsets: chunkOffsets
-    }).compose();
-    var mdatBytes = new Composer.MediaDataBoxComposer({
+    }).build();
+    var mdatBytes = new Builder.MediaDataBoxBuilder({
       data: concatBytes(chunks)
-    }).compose();
+    }).build();
 
-    var stblBytes = new Composer.SampleTableBoxComposer([stsd, stts, stsc, stsz, stcoBytes]).compose();
-    var minfBytes = new Composer.MediaInformationBoxComposer([smhd, dinf, stblBytes]).compose();
-    var mdiaBytes = new Composer.MediaBoxComposer([mdhd, hdlr, minfBytes]).compose();
-    var trakBytes = new Composer.TrackBoxComposer([tkhd, mdiaBytes]).compose();
-    var moovBytes = new Composer.MovieBoxComposer([mvhd, trakBytes]).compose();
+    var stblBytes = new Builder.SampleTableBoxBuilder([stsd, stts, stsc, stsz, stcoBytes]).build();
+    var minfBytes = new Builder.MediaInformationBoxBuilder([smhd, dinf, stblBytes]).build();
+    var mdiaBytes = new Builder.MediaBoxBuilder([mdhd, hdlr, minfBytes]).build();
+    var trakBytes = new Builder.TrackBoxBuilder([tkhd, mdiaBytes]).build();
+    var moovBytes = new Builder.MovieBoxBuilder([mvhd, trakBytes]).build();
 
     return concatBytes([ftyp.bytes, moovBytes, mdatBytes]);
   };
@@ -229,11 +232,11 @@ module Mp4 {
       bufferSizeDB = Math.max(bufferSizeDB, frameLength - 7);
     }
 
-    var ftypBytes = new Composer.FileTypeBoxComposer({
+    var ftypBytes = new Builder.FileTypeBoxBuilder({
       majorBrand: 'M4A ',
       minorVersion: 1,
       compatibleBrands: ['isom', 'M4A ', 'mp42']
-    }).compose();
+    }).build();
     offset += ftypBytes.length;
 
     var creationTime = Date.now();
@@ -242,7 +245,7 @@ module Mp4 {
     var duration = (samples.length * 1024 * timescale / sampleRate) | 0;
     var matrix = [0x00010000, 0, 0, 0, 0x00010000, 0, 0, 0, 0x40000000];
 
-    var mvhdBytes = new Composer.MovieHeaderBoxComposer({
+    var mvhdBytes = new Builder.MovieHeaderBoxBuilder({
       creationTime: creationTime,
       modificationTime: creationTime,
       timescale: timescale,
@@ -251,10 +254,10 @@ module Mp4 {
       volume: 1.0,
       matrix: matrix,
       nextTrackID: 2
-    }).compose();
+    }).build();
     offset += mvhdBytes.length;
 
-    var tkhdBytes = new Composer.TrackHeaderBoxComposer({
+    var tkhdBytes = new Builder.TrackHeaderBoxBuilder({
       flags: 0x000001,
       creationTime: creationTime,
       modificationTime: creationTime,
@@ -266,40 +269,40 @@ module Mp4 {
       matrix: matrix,
       width: 0,
       height: 0
-    }).compose();
+    }).build();
     offset += tkhdBytes.length;
 
-    var mdhdBytes = new Composer.MediaHeaderBoxComposer({
+    var mdhdBytes = new Builder.MediaHeaderBoxBuilder({
       creationTime: creationTime,
       modificationTime: creationTime,
       timescale: timescale,
       duration: duration,
       language: 'und',
-    }).compose();
+    }).build();
     offset += mdhdBytes.length;
 
-    var hdlrBytes = new Composer.HandlerBoxComposer({
+    var hdlrBytes = new Builder.HandlerBoxBuilder({
       handlerType: 'soun',
       name: 'mp4.js sound media handler'
-    }).compose();
+    }).build();
     offset += hdlrBytes.length;
 
-    var smhdBytes = new Composer.SoundMediaHeaderBoxComposer({
+    var smhdBytes = new Builder.SoundMediaHeaderBoxBuilder({
       balance: 0
-    }).compose();
+    }).build();
     offset += smhdBytes.length;
 
-    var urlBytes = new Composer.DataEntryUrlBoxComposer({
+    var urlBytes = new Builder.DataEntryUrlBoxBuilder({
       flags: 0x000001,
       location: ''
-    }).compose();
+    }).build();
 
-    var drefBytes = new Composer.DataReferenceBoxComposer({
+    var drefBytes = new Builder.DataReferenceBoxBuilder({
       entryCount: 1,
       entries: [urlBytes]
-    }).compose();
+    }).build();
 
-    var dinfBytes = new Composer.DataInformationBoxComposer([drefBytes]).compose();
+    var dinfBytes = new Builder.DataInformationBoxBuilder([drefBytes]).build();
     offset += dinfBytes.length;
 
     var OBJECT_TYPE_INDICATION = Parser.DecoderConfigDescriptorParser.OBJECT_TYPE_INDICATION;
@@ -342,32 +345,32 @@ module Mp4 {
       esBox: esBox
     };
 
-    var mp4aBytes = new Composer.MP4AudioSampleEntryComposer({
+    var mp4aBytes = new Builder.MP4AudioSampleEntryBuilder({
       type: BOX_TYPE_MP4_AUDIO_SAMPLE_ENTRY,
       dataReferenceIndex: 1,
       channelCount: aacInfo.channelConfiguration,
       sampleSize: 16,
       sampleRate: sampleRate,
       esBox: esBox
-    }).compose();
+    }).build();
 
-    var stsdBytes = new Composer.SampleDescriptionBoxComposer({
+    var stsdBytes = new Builder.SampleDescriptionBoxBuilder({
       entryCount: 1,
       boxes: [audioSampleEntry]
-    }).compose();
+    }).build();
     offset += stsdBytes.length;
 
-    var sttsBytes = new Composer.TimeToSampleBoxComposer({
+    var sttsBytes = new Builder.TimeToSampleBoxBuilder({
       entryCount: 1,
       entries: [{ sampleCount: samples.length, sampleDelta: 1024 }]
-    }).compose();
+    }).build();
     offset += sttsBytes.length;
 
-    var stszBytes = new Composer.SampleSizeBoxComposer({
+    var stszBytes = new Builder.SampleSizeBoxBuilder({
       sampleSize: 0,
       sampleCount: samples.length,
       sampleSizes: samples.map(sample => sample.byteLength)
-    }).compose();
+    }).build();
     offset += stszBytes.length;
 
     var mod16 = samples.length % 16;
@@ -386,10 +389,10 @@ module Mp4 {
         sampleDescriptionIndex: 1
       });
     }
-    var stscBytes = new Composer.SampleToChunkBoxComposer({
+    var stscBytes = new Builder.SampleToChunkBoxBuilder({
       entryCount: stscEntryCount,
       entries: stscEntries
-    }).compose();
+    }).build();
     offset += stscBytes.length;
 
     var stcoEntryCount = Math.ceil(samples.length / 16);
@@ -400,19 +403,19 @@ module Mp4 {
       if (i % 16 === 0) chunkOffsets.push(chunkOffset);
       chunkOffset += samples[i].byteLength;
     }
-    var stcoBytes = new Composer.ChunkOffsetBoxComposer({
+    var stcoBytes = new Builder.ChunkOffsetBoxBuilder({
       entryCount: stcoEntryCount,
       chunkOffsets: chunkOffsets
-    }).compose();
+    }).build();
 
-    var stblBytes = new Composer.SampleTableBoxComposer([stsdBytes, sttsBytes, stszBytes, stscBytes, stcoBytes]).compose();
-    var minfBytes = new Composer.MediaInformationBoxComposer([smhdBytes, dinfBytes, stblBytes]).compose();
-    var mdiaBytes = new Composer.MediaBoxComposer([mdhdBytes, hdlrBytes, minfBytes]).compose();
-    var trakBytes = new Composer.TrackBoxComposer([tkhdBytes, mdiaBytes]).compose();
-    var moovBytes = new Composer.MovieBoxComposer([mvhdBytes, trakBytes]).compose();
-    var mdatBytes = new Composer.MediaDataBoxComposer({
+    var stblBytes = new Builder.SampleTableBoxBuilder([stsdBytes, sttsBytes, stszBytes, stscBytes, stcoBytes]).build();
+    var minfBytes = new Builder.MediaInformationBoxBuilder([smhdBytes, dinfBytes, stblBytes]).build();
+    var mdiaBytes = new Builder.MediaBoxBuilder([mdhdBytes, hdlrBytes, minfBytes]).build();
+    var trakBytes = new Builder.TrackBoxBuilder([tkhdBytes, mdiaBytes]).build();
+    var moovBytes = new Builder.MovieBoxBuilder([mvhdBytes, trakBytes]).build();
+    var mdatBytes = new Builder.MediaDataBoxBuilder({
       data: concatBytes(samples)
-    }).compose();
+    }).build();
 
     return concatBytes([ftypBytes, moovBytes, mdatBytes]);
   };

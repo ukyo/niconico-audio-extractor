@@ -1,24 +1,24 @@
 var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
     __.prototype = b.prototype;
     d.prototype = new __();
 };
 var Mp4;
 (function (Mp4) {
-    (function (Composer) {
-        var BaseComposer = (function (_super) {
-            __extends(BaseComposer, _super);
-            function BaseComposer() {
+    (function (Builder) {
+        var BaseBuilder = (function (_super) {
+            __extends(BaseBuilder, _super);
+            function BaseBuilder() {
                 _super.apply(this, arguments);
-
             }
-            BaseComposer.prototype.compose = function () {
+            BaseBuilder.prototype.build = function () {
                 return this.data;
             };
-            return BaseComposer;
+            return BaseBuilder;
         })(Mp4.BitWriter);
-        Composer.BaseComposer = BaseComposer;        
-    })(Mp4.Composer || (Mp4.Composer = {}));
-    var Composer = Mp4.Composer;
+        Builder.BaseBuilder = BaseBuilder;
+    })(Mp4.Builder || (Mp4.Builder = {}));
+    var Builder = Mp4.Builder;
 })(Mp4 || (Mp4 = {}));
-//@ sourceMappingURL=composer.js.map
+//# sourceMappingURL=composer.js.map

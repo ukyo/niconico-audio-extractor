@@ -1,99 +1,106 @@
 var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
     __.prototype = b.prototype;
     d.prototype = new __();
 };
 var Mp4;
 (function (Mp4) {
-    (function (Composer) {
-        var BoxComposer = (function (_super) {
-            __extends(BoxComposer, _super);
-            function BoxComposer() {
-                        _super.call(this);
+    (function (Builder) {
+        var BoxBuilder = (function (_super) {
+            __extends(BoxBuilder, _super);
+            function BoxBuilder() {
+                _super.call(this);
                 this.skipBytes(4);
                 this.writeString(this['constructor'].TYPE);
             }
-            BoxComposer.prototype.compose = function () {
+            BoxBuilder.prototype.build = function () {
                 this.view.setUint32(0, this.byteOffset);
-                return _super.prototype.compose.call(this);
+                return _super.prototype.build.call(this);
             };
-            BoxComposer.prototype.writeBox = function (box) {
+
+            BoxBuilder.prototype.writeBox = function (box) {
                 var bytes;
-                if(box instanceof Uint8Array) {
+                if (box instanceof Uint8Array) {
                     bytes = box;
-                } else if(box.bytes) {
+                } else if (box.bytes) {
                     bytes = box.bytes;
                 } else {
-                    bytes = createBoxComposer(box).compose();
+                    bytes = createBoxBuilder(box).build();
                 }
                 this.writeBytes(bytes);
             };
-            return BoxComposer;
-        })(Composer.DescriptorComposerMixin);
-        Composer.BoxComposer = BoxComposer;        
-        var FullBoxComposer = (function (_super) {
-            __extends(FullBoxComposer, _super);
-            function FullBoxComposer(box) {
-                        _super.call(this);
+            return BoxBuilder;
+        })(Builder.DescriptorBuilderMixin);
+        Builder.BoxBuilder = BoxBuilder;
+
+        var FullBoxBuilder = (function (_super) {
+            __extends(FullBoxBuilder, _super);
+            function FullBoxBuilder(box) {
+                _super.call(this);
                 this.box = box;
                 this.writeUint8(box.version || 0);
                 this.writeUint24(box.flags || 0);
             }
-            return FullBoxComposer;
-        })(BoxComposer);
-        Composer.FullBoxComposer = FullBoxComposer;        
-        var BoxListComposer = (function (_super) {
-            __extends(BoxListComposer, _super);
-            function BoxListComposer(boxes) {
+            return FullBoxBuilder;
+        })(BoxBuilder);
+        Builder.FullBoxBuilder = FullBoxBuilder;
+
+        var BoxListBuilder = (function (_super) {
+            __extends(BoxListBuilder, _super);
+            function BoxListBuilder(boxes) {
                 var _this = this;
-                        _super.call(this);
+                _super.call(this);
                 boxes.forEach(function (box) {
                     return _this.writeBox(box);
                 });
             }
-            return BoxListComposer;
-        })(BoxComposer);
-        Composer.BoxListComposer = BoxListComposer;        
-        var FileTypeBoxComposer = (function (_super) {
-            __extends(FileTypeBoxComposer, _super);
-            function FileTypeBoxComposer(box) {
+            return BoxListBuilder;
+        })(BoxBuilder);
+        Builder.BoxListBuilder = BoxListBuilder;
+
+        var FileTypeBoxBuilder = (function (_super) {
+            __extends(FileTypeBoxBuilder, _super);
+            function FileTypeBoxBuilder(box) {
                 var _this = this;
-                        _super.call(this);
+                _super.call(this);
                 this.writeString(box.majorBrand);
                 this.writeUint32(box.minorVersion);
                 box.compatibleBrands.forEach(function (brand) {
                     return _this.writeString(brand);
                 });
             }
-            FileTypeBoxComposer.TYPE = Mp4.BOX_TYPE_FILE_TYPE_BOX;
-            return FileTypeBoxComposer;
-        })(BoxComposer);
-        Composer.FileTypeBoxComposer = FileTypeBoxComposer;        
-        var MovieBoxComposer = (function (_super) {
-            __extends(MovieBoxComposer, _super);
-            function MovieBoxComposer() {
-                _super.apply(this, arguments);
+            FileTypeBoxBuilder.TYPE = Mp4.BOX_TYPE_FILE_TYPE_BOX;
+            return FileTypeBoxBuilder;
+        })(BoxBuilder);
+        Builder.FileTypeBoxBuilder = FileTypeBoxBuilder;
 
+        var MovieBoxBuilder = (function (_super) {
+            __extends(MovieBoxBuilder, _super);
+            function MovieBoxBuilder() {
+                _super.apply(this, arguments);
             }
-            MovieBoxComposer.TYPE = Mp4.BOX_TYPE_MOVIE_BOX;
-            return MovieBoxComposer;
-        })(BoxListComposer);
-        Composer.MovieBoxComposer = MovieBoxComposer;        
-        var MediaDataBoxComposer = (function (_super) {
-            __extends(MediaDataBoxComposer, _super);
-            function MediaDataBoxComposer(box) {
-                        _super.call(this);
+            MovieBoxBuilder.TYPE = Mp4.BOX_TYPE_MOVIE_BOX;
+            return MovieBoxBuilder;
+        })(BoxListBuilder);
+        Builder.MovieBoxBuilder = MovieBoxBuilder;
+
+        var MediaDataBoxBuilder = (function (_super) {
+            __extends(MediaDataBoxBuilder, _super);
+            function MediaDataBoxBuilder(box) {
+                _super.call(this);
                 this.writeBytes(box.data);
             }
-            MediaDataBoxComposer.TYPE = Mp4.BOX_TYPE_MEDIA_DATA_BOX;
-            return MediaDataBoxComposer;
-        })(BoxComposer);
-        Composer.MediaDataBoxComposer = MediaDataBoxComposer;        
-        var MovieHeaderBoxComposer = (function (_super) {
-            __extends(MovieHeaderBoxComposer, _super);
-            function MovieHeaderBoxComposer(box) {
+            MediaDataBoxBuilder.TYPE = Mp4.BOX_TYPE_MEDIA_DATA_BOX;
+            return MediaDataBoxBuilder;
+        })(BoxBuilder);
+        Builder.MediaDataBoxBuilder = MediaDataBoxBuilder;
+
+        var MovieHeaderBoxBuilder = (function (_super) {
+            __extends(MovieHeaderBoxBuilder, _super);
+            function MovieHeaderBoxBuilder(box) {
                 var _this = this;
-                        _super.call(this, box);
+                _super.call(this, box);
                 this.writeUint32(box.creationTime);
                 this.writeUint32(box.modificationTime);
                 this.writeUint32(box.timescale);
@@ -108,25 +115,26 @@ var Mp4;
                 this.skipBytes(4 * 6);
                 this.writeUint32(box.nextTrackID);
             }
-            MovieHeaderBoxComposer.TYPE = Mp4.BOX_TYPE_MOVIE_HEADER_BOX;
-            return MovieHeaderBoxComposer;
-        })(FullBoxComposer);
-        Composer.MovieHeaderBoxComposer = MovieHeaderBoxComposer;        
-        var TrackBoxComposer = (function (_super) {
-            __extends(TrackBoxComposer, _super);
-            function TrackBoxComposer() {
-                _super.apply(this, arguments);
+            MovieHeaderBoxBuilder.TYPE = Mp4.BOX_TYPE_MOVIE_HEADER_BOX;
+            return MovieHeaderBoxBuilder;
+        })(FullBoxBuilder);
+        Builder.MovieHeaderBoxBuilder = MovieHeaderBoxBuilder;
 
+        var TrackBoxBuilder = (function (_super) {
+            __extends(TrackBoxBuilder, _super);
+            function TrackBoxBuilder() {
+                _super.apply(this, arguments);
             }
-            TrackBoxComposer.TYPE = Mp4.BOX_TYPE_TRACK_BOX;
-            return TrackBoxComposer;
-        })(BoxListComposer);
-        Composer.TrackBoxComposer = TrackBoxComposer;        
-        var TrackHeaderBoxComposer = (function (_super) {
-            __extends(TrackHeaderBoxComposer, _super);
-            function TrackHeaderBoxComposer(box) {
+            TrackBoxBuilder.TYPE = Mp4.BOX_TYPE_TRACK_BOX;
+            return TrackBoxBuilder;
+        })(BoxListBuilder);
+        Builder.TrackBoxBuilder = TrackBoxBuilder;
+
+        var TrackHeaderBoxBuilder = (function (_super) {
+            __extends(TrackHeaderBoxBuilder, _super);
+            function TrackHeaderBoxBuilder(box) {
                 var _this = this;
-                        _super.call(this, box);
+                _super.call(this, box);
                 this.writeUint32(box.creationTime);
                 this.writeUint32(box.modificationTime);
                 this.writeUint32(box.trackID);
@@ -143,67 +151,69 @@ var Mp4;
                 this.writeUint32(box.width * 0x10000);
                 this.writeUint32(box.height * 0x10000);
             }
-            TrackHeaderBoxComposer.TYPE = Mp4.BOX_TYPE_TRACK_HEADER_BOX;
-            return TrackHeaderBoxComposer;
-        })(FullBoxComposer);
-        Composer.TrackHeaderBoxComposer = TrackHeaderBoxComposer;        
-        var TrackReferenceBoxComposer = (function (_super) {
-            __extends(TrackReferenceBoxComposer, _super);
-            function TrackReferenceBoxComposer() {
-                _super.apply(this, arguments);
+            TrackHeaderBoxBuilder.TYPE = Mp4.BOX_TYPE_TRACK_HEADER_BOX;
+            return TrackHeaderBoxBuilder;
+        })(FullBoxBuilder);
+        Builder.TrackHeaderBoxBuilder = TrackHeaderBoxBuilder;
 
+        var TrackReferenceBoxBuilder = (function (_super) {
+            __extends(TrackReferenceBoxBuilder, _super);
+            function TrackReferenceBoxBuilder() {
+                _super.apply(this, arguments);
             }
-            TrackReferenceBoxComposer.TYPE = Mp4.BOX_TYPE_TRACK_REFERENCE_BOX;
-            return TrackReferenceBoxComposer;
-        })(BoxListComposer);
-        Composer.TrackReferenceBoxComposer = TrackReferenceBoxComposer;        
-        var TrackReferenceTypeBoxComposer = (function (_super) {
-            __extends(TrackReferenceTypeBoxComposer, _super);
-            function TrackReferenceTypeBoxComposer(box) {
+            TrackReferenceBoxBuilder.TYPE = Mp4.BOX_TYPE_TRACK_REFERENCE_BOX;
+            return TrackReferenceBoxBuilder;
+        })(BoxListBuilder);
+        Builder.TrackReferenceBoxBuilder = TrackReferenceBoxBuilder;
+
+        var TrackReferenceTypeBoxBuilder = (function (_super) {
+            __extends(TrackReferenceTypeBoxBuilder, _super);
+            function TrackReferenceTypeBoxBuilder(box) {
                 var _this = this;
-                        _super.call(this);
+                _super.call(this);
                 box.trackIDs.forEach(function (id) {
                     return _this.writeUint32(id);
                 });
             }
-            return TrackReferenceTypeBoxComposer;
-        })(BoxComposer);
-        Composer.TrackReferenceTypeBoxComposer = TrackReferenceTypeBoxComposer;        
-        var HintTrackReferenceTypeBoxComposer = (function (_super) {
-            __extends(HintTrackReferenceTypeBoxComposer, _super);
-            function HintTrackReferenceTypeBoxComposer() {
-                _super.apply(this, arguments);
+            return TrackReferenceTypeBoxBuilder;
+        })(BoxBuilder);
+        Builder.TrackReferenceTypeBoxBuilder = TrackReferenceTypeBoxBuilder;
 
-            }
-            HintTrackReferenceTypeBoxComposer.TYPE = Mp4.BOX_TYPE_HINT_TRACK_REFERENCE_TYPE_BOX;
-            return HintTrackReferenceTypeBoxComposer;
-        })(TrackReferenceTypeBoxComposer);
-        Composer.HintTrackReferenceTypeBoxComposer = HintTrackReferenceTypeBoxComposer;        
-        var DescribeTrackReferenceTypeBoxComposer = (function (_super) {
-            __extends(DescribeTrackReferenceTypeBoxComposer, _super);
-            function DescribeTrackReferenceTypeBoxComposer() {
+        var HintTrackReferenceTypeBoxBuilder = (function (_super) {
+            __extends(HintTrackReferenceTypeBoxBuilder, _super);
+            function HintTrackReferenceTypeBoxBuilder() {
                 _super.apply(this, arguments);
-
             }
-            DescribeTrackReferenceTypeBoxComposer.TYPE = Mp4.BOX_TYPE_DISCRIBE_TRACK_REFERENCE_TYPE_BOX;
-            return DescribeTrackReferenceTypeBoxComposer;
-        })(TrackReferenceTypeBoxComposer);
-        Composer.DescribeTrackReferenceTypeBoxComposer = DescribeTrackReferenceTypeBoxComposer;        
-        var MediaBoxComposer = (function (_super) {
-            __extends(MediaBoxComposer, _super);
-            function MediaBoxComposer() {
+            HintTrackReferenceTypeBoxBuilder.TYPE = Mp4.BOX_TYPE_HINT_TRACK_REFERENCE_TYPE_BOX;
+            return HintTrackReferenceTypeBoxBuilder;
+        })(TrackReferenceTypeBoxBuilder);
+        Builder.HintTrackReferenceTypeBoxBuilder = HintTrackReferenceTypeBoxBuilder;
+
+        var DescribeTrackReferenceTypeBoxBuilder = (function (_super) {
+            __extends(DescribeTrackReferenceTypeBoxBuilder, _super);
+            function DescribeTrackReferenceTypeBoxBuilder() {
                 _super.apply(this, arguments);
-
             }
-            MediaBoxComposer.TYPE = Mp4.BOX_TYPE_MEDIA_BOX;
-            return MediaBoxComposer;
-        })(BoxListComposer);
-        Composer.MediaBoxComposer = MediaBoxComposer;        
-        var MediaHeaderBoxComposer = (function (_super) {
-            __extends(MediaHeaderBoxComposer, _super);
-            function MediaHeaderBoxComposer(box) {
+            DescribeTrackReferenceTypeBoxBuilder.TYPE = Mp4.BOX_TYPE_DISCRIBE_TRACK_REFERENCE_TYPE_BOX;
+            return DescribeTrackReferenceTypeBoxBuilder;
+        })(TrackReferenceTypeBoxBuilder);
+        Builder.DescribeTrackReferenceTypeBoxBuilder = DescribeTrackReferenceTypeBoxBuilder;
+
+        var MediaBoxBuilder = (function (_super) {
+            __extends(MediaBoxBuilder, _super);
+            function MediaBoxBuilder() {
+                _super.apply(this, arguments);
+            }
+            MediaBoxBuilder.TYPE = Mp4.BOX_TYPE_MEDIA_BOX;
+            return MediaBoxBuilder;
+        })(BoxListBuilder);
+        Builder.MediaBoxBuilder = MediaBoxBuilder;
+
+        var MediaHeaderBoxBuilder = (function (_super) {
+            __extends(MediaHeaderBoxBuilder, _super);
+            function MediaHeaderBoxBuilder(box) {
                 var _this = this;
-                        _super.call(this, box);
+                _super.call(this, box);
                 this.writeUint32(box.creationTime);
                 this.writeUint32(box.modificationTime);
                 this.writeUint32(box.timescale);
@@ -214,190 +224,202 @@ var Mp4;
                 });
                 this.skipBytes(2);
             }
-            MediaHeaderBoxComposer.TYPE = Mp4.BOX_TYPE_MEDIA_HEADER_BOX;
-            return MediaHeaderBoxComposer;
-        })(FullBoxComposer);
-        Composer.MediaHeaderBoxComposer = MediaHeaderBoxComposer;        
-        var HandlerBoxComposer = (function (_super) {
-            __extends(HandlerBoxComposer, _super);
-            function HandlerBoxComposer(box) {
-                        _super.call(this, box);
+            MediaHeaderBoxBuilder.TYPE = Mp4.BOX_TYPE_MEDIA_HEADER_BOX;
+            return MediaHeaderBoxBuilder;
+        })(FullBoxBuilder);
+        Builder.MediaHeaderBoxBuilder = MediaHeaderBoxBuilder;
+
+        var HandlerBoxBuilder = (function (_super) {
+            __extends(HandlerBoxBuilder, _super);
+            function HandlerBoxBuilder(box) {
+                _super.call(this, box);
                 this.skipBytes(4);
                 this.writeString(box.handlerType);
                 this.skipBytes(4 * 3);
                 this.writeUTF8StringNullTerminated(box.name);
             }
-            HandlerBoxComposer.TYPE = Mp4.BOX_TYPE_HANDLER_BOX;
-            return HandlerBoxComposer;
-        })(FullBoxComposer);
-        Composer.HandlerBoxComposer = HandlerBoxComposer;        
-        var MediaInformationBoxComposer = (function (_super) {
-            __extends(MediaInformationBoxComposer, _super);
-            function MediaInformationBoxComposer() {
-                _super.apply(this, arguments);
+            HandlerBoxBuilder.TYPE = Mp4.BOX_TYPE_HANDLER_BOX;
+            return HandlerBoxBuilder;
+        })(FullBoxBuilder);
+        Builder.HandlerBoxBuilder = HandlerBoxBuilder;
 
+        var MediaInformationBoxBuilder = (function (_super) {
+            __extends(MediaInformationBoxBuilder, _super);
+            function MediaInformationBoxBuilder() {
+                _super.apply(this, arguments);
             }
-            MediaInformationBoxComposer.TYPE = Mp4.BOX_TYPE_MEDIA_INFORMATION_BOX;
-            return MediaInformationBoxComposer;
-        })(BoxListComposer);
-        Composer.MediaInformationBoxComposer = MediaInformationBoxComposer;        
-        var VideoMediaHeaderBoxComposer = (function (_super) {
-            __extends(VideoMediaHeaderBoxComposer, _super);
-            function VideoMediaHeaderBoxComposer(box) {
+            MediaInformationBoxBuilder.TYPE = Mp4.BOX_TYPE_MEDIA_INFORMATION_BOX;
+            return MediaInformationBoxBuilder;
+        })(BoxListBuilder);
+        Builder.MediaInformationBoxBuilder = MediaInformationBoxBuilder;
+
+        var VideoMediaHeaderBoxBuilder = (function (_super) {
+            __extends(VideoMediaHeaderBoxBuilder, _super);
+            function VideoMediaHeaderBoxBuilder(box) {
                 var _this = this;
-                        _super.call(this, box);
+                _super.call(this, box);
                 this.writeUint16(box.graphicsmode);
                 box.opcolor.forEach(function (x) {
                     return _this.writeUint16(x);
                 });
             }
-            VideoMediaHeaderBoxComposer.TYPE = Mp4.BOX_TYPE_VIDEO_MEDIA_HEADER_BOX;
-            return VideoMediaHeaderBoxComposer;
-        })(FullBoxComposer);
-        Composer.VideoMediaHeaderBoxComposer = VideoMediaHeaderBoxComposer;        
-        var SoundMediaHeaderBoxComposer = (function (_super) {
-            __extends(SoundMediaHeaderBoxComposer, _super);
-            function SoundMediaHeaderBoxComposer(box) {
-                        _super.call(this, box);
+            VideoMediaHeaderBoxBuilder.TYPE = Mp4.BOX_TYPE_VIDEO_MEDIA_HEADER_BOX;
+            return VideoMediaHeaderBoxBuilder;
+        })(FullBoxBuilder);
+        Builder.VideoMediaHeaderBoxBuilder = VideoMediaHeaderBoxBuilder;
+
+        var SoundMediaHeaderBoxBuilder = (function (_super) {
+            __extends(SoundMediaHeaderBoxBuilder, _super);
+            function SoundMediaHeaderBoxBuilder(box) {
+                _super.call(this, box);
                 this.writeInt16(box.balance);
                 this.skipBytes(2);
             }
-            SoundMediaHeaderBoxComposer.TYPE = Mp4.BOX_TYPE_SOUND_MEDIA_HEADER_BOX;
-            return SoundMediaHeaderBoxComposer;
-        })(FullBoxComposer);
-        Composer.SoundMediaHeaderBoxComposer = SoundMediaHeaderBoxComposer;        
-        var HintMediaHeaderBoxComposer = (function (_super) {
-            __extends(HintMediaHeaderBoxComposer, _super);
-            function HintMediaHeaderBoxComposer(box) {
-                        _super.call(this, box);
+            SoundMediaHeaderBoxBuilder.TYPE = Mp4.BOX_TYPE_SOUND_MEDIA_HEADER_BOX;
+            return SoundMediaHeaderBoxBuilder;
+        })(FullBoxBuilder);
+        Builder.SoundMediaHeaderBoxBuilder = SoundMediaHeaderBoxBuilder;
+
+        var HintMediaHeaderBoxBuilder = (function (_super) {
+            __extends(HintMediaHeaderBoxBuilder, _super);
+            function HintMediaHeaderBoxBuilder(box) {
+                _super.call(this, box);
                 this.writeUint16(box.maxPDUsize);
                 this.writeUint16(box.avgPDUsize);
                 this.writeUint32(box.maxbitrate);
                 this.writeUint32(box.avgbitrate);
                 this.skipBytes(4);
             }
-            HintMediaHeaderBoxComposer.TYPE = Mp4.BOX_TYPE_HINT_MEDIA_HEADER_BOX;
-            return HintMediaHeaderBoxComposer;
-        })(FullBoxComposer);
-        Composer.HintMediaHeaderBoxComposer = HintMediaHeaderBoxComposer;        
-        var NullMediaHeaderBoxComposer = (function (_super) {
-            __extends(NullMediaHeaderBoxComposer, _super);
-            function NullMediaHeaderBoxComposer() {
-                _super.apply(this, arguments);
+            HintMediaHeaderBoxBuilder.TYPE = Mp4.BOX_TYPE_HINT_MEDIA_HEADER_BOX;
+            return HintMediaHeaderBoxBuilder;
+        })(FullBoxBuilder);
+        Builder.HintMediaHeaderBoxBuilder = HintMediaHeaderBoxBuilder;
 
-            }
-            NullMediaHeaderBoxComposer.TYPE = Mp4.BOX_TYPE_NULL_MEDIA_HEADER_BOX;
-            return NullMediaHeaderBoxComposer;
-        })(FullBoxComposer);
-        Composer.NullMediaHeaderBoxComposer = NullMediaHeaderBoxComposer;        
-        var DataInformationBoxComposer = (function (_super) {
-            __extends(DataInformationBoxComposer, _super);
-            function DataInformationBoxComposer() {
+        var NullMediaHeaderBoxBuilder = (function (_super) {
+            __extends(NullMediaHeaderBoxBuilder, _super);
+            function NullMediaHeaderBoxBuilder() {
                 _super.apply(this, arguments);
-
             }
-            DataInformationBoxComposer.TYPE = Mp4.BOX_TYPE_DATA_INFORMATION_BOX;
-            return DataInformationBoxComposer;
-        })(BoxListComposer);
-        Composer.DataInformationBoxComposer = DataInformationBoxComposer;        
-        var DataEntryUrlBoxComposer = (function (_super) {
-            __extends(DataEntryUrlBoxComposer, _super);
-            function DataEntryUrlBoxComposer(box) {
-                        _super.call(this, box);
+            NullMediaHeaderBoxBuilder.TYPE = Mp4.BOX_TYPE_NULL_MEDIA_HEADER_BOX;
+            return NullMediaHeaderBoxBuilder;
+        })(FullBoxBuilder);
+        Builder.NullMediaHeaderBoxBuilder = NullMediaHeaderBoxBuilder;
+
+        var DataInformationBoxBuilder = (function (_super) {
+            __extends(DataInformationBoxBuilder, _super);
+            function DataInformationBoxBuilder() {
+                _super.apply(this, arguments);
+            }
+            DataInformationBoxBuilder.TYPE = Mp4.BOX_TYPE_DATA_INFORMATION_BOX;
+            return DataInformationBoxBuilder;
+        })(BoxListBuilder);
+        Builder.DataInformationBoxBuilder = DataInformationBoxBuilder;
+
+        var DataEntryUrlBoxBuilder = (function (_super) {
+            __extends(DataEntryUrlBoxBuilder, _super);
+            function DataEntryUrlBoxBuilder(box) {
+                _super.call(this, box);
                 this.writeUTF8StringNullTerminated(box.location);
             }
-            DataEntryUrlBoxComposer.TYPE = Mp4.BOX_TYPE_DATA_ENTRY_URL_BOX;
-            return DataEntryUrlBoxComposer;
-        })(FullBoxComposer);
-        Composer.DataEntryUrlBoxComposer = DataEntryUrlBoxComposer;        
-        var DataEntryUrnBoxComposer = (function (_super) {
-            __extends(DataEntryUrnBoxComposer, _super);
-            function DataEntryUrnBoxComposer(box) {
-                        _super.call(this, box);
+            DataEntryUrlBoxBuilder.TYPE = Mp4.BOX_TYPE_DATA_ENTRY_URL_BOX;
+            return DataEntryUrlBoxBuilder;
+        })(FullBoxBuilder);
+        Builder.DataEntryUrlBoxBuilder = DataEntryUrlBoxBuilder;
+
+        var DataEntryUrnBoxBuilder = (function (_super) {
+            __extends(DataEntryUrnBoxBuilder, _super);
+            function DataEntryUrnBoxBuilder(box) {
+                _super.call(this, box);
                 this.writeUTF8StringNullTerminated(box.name);
                 this.writeUTF8StringNullTerminated(box.location);
             }
-            DataEntryUrnBoxComposer.TYPE = Mp4.BOX_TYPE_DATA_ENTRY_URN_BOX;
-            return DataEntryUrnBoxComposer;
-        })(FullBoxComposer);
-        Composer.DataEntryUrnBoxComposer = DataEntryUrnBoxComposer;        
-        var DataReferenceBoxComposer = (function (_super) {
-            __extends(DataReferenceBoxComposer, _super);
-            function DataReferenceBoxComposer(box) {
+            DataEntryUrnBoxBuilder.TYPE = Mp4.BOX_TYPE_DATA_ENTRY_URN_BOX;
+            return DataEntryUrnBoxBuilder;
+        })(FullBoxBuilder);
+        Builder.DataEntryUrnBoxBuilder = DataEntryUrnBoxBuilder;
+
+        var DataReferenceBoxBuilder = (function (_super) {
+            __extends(DataReferenceBoxBuilder, _super);
+            function DataReferenceBoxBuilder(box) {
                 var _this = this;
-                        _super.call(this, box);
+                _super.call(this, box);
                 this.writeUint32(box.entryCount);
                 box.entries.forEach(function (entry) {
                     return _this.writeBox(entry);
                 });
             }
-            DataReferenceBoxComposer.TYPE = Mp4.BOX_TYPE_DATA_REFERENCE_BOX;
-            return DataReferenceBoxComposer;
-        })(FullBoxComposer);
-        Composer.DataReferenceBoxComposer = DataReferenceBoxComposer;        
-        var SampleTableBoxComposer = (function (_super) {
-            __extends(SampleTableBoxComposer, _super);
-            function SampleTableBoxComposer() {
-                _super.apply(this, arguments);
+            DataReferenceBoxBuilder.TYPE = Mp4.BOX_TYPE_DATA_REFERENCE_BOX;
+            return DataReferenceBoxBuilder;
+        })(FullBoxBuilder);
+        Builder.DataReferenceBoxBuilder = DataReferenceBoxBuilder;
 
+        var SampleTableBoxBuilder = (function (_super) {
+            __extends(SampleTableBoxBuilder, _super);
+            function SampleTableBoxBuilder() {
+                _super.apply(this, arguments);
             }
-            SampleTableBoxComposer.TYPE = Mp4.BOX_TYPE_SAMPLE_TABLE_BOX;
-            return SampleTableBoxComposer;
-        })(BoxListComposer);
-        Composer.SampleTableBoxComposer = SampleTableBoxComposer;        
-        var TimeToSampleBoxComposer = (function (_super) {
-            __extends(TimeToSampleBoxComposer, _super);
-            function TimeToSampleBoxComposer(box) {
+            SampleTableBoxBuilder.TYPE = Mp4.BOX_TYPE_SAMPLE_TABLE_BOX;
+            return SampleTableBoxBuilder;
+        })(BoxListBuilder);
+        Builder.SampleTableBoxBuilder = SampleTableBoxBuilder;
+
+        var TimeToSampleBoxBuilder = (function (_super) {
+            __extends(TimeToSampleBoxBuilder, _super);
+            function TimeToSampleBoxBuilder(box) {
                 var _this = this;
-                        _super.call(this, box);
+                _super.call(this, box);
                 this.writeUint32(box.entryCount);
                 box.entries.forEach(function (entry) {
                     _this.writeUint32(entry.sampleCount);
                     _this.writeUint32(entry.sampleDelta);
                 });
             }
-            TimeToSampleBoxComposer.TYPE = Mp4.BOX_TYPE_TIME_TO_SAMPLE_BOX;
-            return TimeToSampleBoxComposer;
-        })(FullBoxComposer);
-        Composer.TimeToSampleBoxComposer = TimeToSampleBoxComposer;        
-        var CompositionOffsetBoxComposer = (function (_super) {
-            __extends(CompositionOffsetBoxComposer, _super);
-            function CompositionOffsetBoxComposer(box) {
+            TimeToSampleBoxBuilder.TYPE = Mp4.BOX_TYPE_TIME_TO_SAMPLE_BOX;
+            return TimeToSampleBoxBuilder;
+        })(FullBoxBuilder);
+        Builder.TimeToSampleBoxBuilder = TimeToSampleBoxBuilder;
+
+        var CompositionOffsetBoxBuilder = (function (_super) {
+            __extends(CompositionOffsetBoxBuilder, _super);
+            function CompositionOffsetBoxBuilder(box) {
                 var _this = this;
-                        _super.call(this, box);
+                _super.call(this, box);
                 this.writeUint32(box.entryCount);
                 box.entries.forEach(function (entry) {
                     _this.writeUint32(entry.sampleCount);
                     _this.writeUint32(entry.sampleOffset);
                 });
             }
-            CompositionOffsetBoxComposer.TYPE = Mp4.BOX_TYPE_COMPOSITION_OFFSET_BOX;
-            return CompositionOffsetBoxComposer;
-        })(FullBoxComposer);
-        Composer.CompositionOffsetBoxComposer = CompositionOffsetBoxComposer;        
-        var SampleEntryComposer = (function (_super) {
-            __extends(SampleEntryComposer, _super);
-            function SampleEntryComposer(box) {
-                        _super.call(this);
+            CompositionOffsetBoxBuilder.TYPE = Mp4.BOX_TYPE_COMPOSITION_OFFSET_BOX;
+            return CompositionOffsetBoxBuilder;
+        })(FullBoxBuilder);
+        Builder.CompositionOffsetBoxBuilder = CompositionOffsetBoxBuilder;
+
+        var SampleEntryBuilder = (function (_super) {
+            __extends(SampleEntryBuilder, _super);
+            function SampleEntryBuilder(box) {
+                _super.call(this);
                 this.skipBytes(6);
                 this.writeUint16(box.dataReferenceIndex);
             }
-            return SampleEntryComposer;
-        })(BoxComposer);
-        Composer.SampleEntryComposer = SampleEntryComposer;        
-        var HintSampleEntryComposer = (function (_super) {
-            __extends(HintSampleEntryComposer, _super);
-            function HintSampleEntryComposer(box) {
-                        _super.call(this, box);
+            return SampleEntryBuilder;
+        })(BoxBuilder);
+        Builder.SampleEntryBuilder = SampleEntryBuilder;
+
+        var HintSampleEntryBuilder = (function (_super) {
+            __extends(HintSampleEntryBuilder, _super);
+            function HintSampleEntryBuilder(box) {
+                _super.call(this, box);
                 this.writeBytes(box.data);
             }
-            return HintSampleEntryComposer;
-        })(SampleEntryComposer);
-        Composer.HintSampleEntryComposer = HintSampleEntryComposer;        
-        var VisualSampleEntryComposer = (function (_super) {
-            __extends(VisualSampleEntryComposer, _super);
-            function VisualSampleEntryComposer(box) {
-                        _super.call(this, box);
+            return HintSampleEntryBuilder;
+        })(SampleEntryBuilder);
+        Builder.HintSampleEntryBuilder = HintSampleEntryBuilder;
+
+        var VisualSampleEntryBuilder = (function (_super) {
+            __extends(VisualSampleEntryBuilder, _super);
+            function VisualSampleEntryBuilder(box) {
+                _super.call(this, box);
                 this.skipBytes(2);
                 this.skipBytes(2);
                 this.skipBytes(4 * 3);
@@ -411,35 +433,38 @@ var Mp4;
                 this.writeUint16(box.depth);
                 this.writeInt16(-1);
             }
-            return VisualSampleEntryComposer;
-        })(SampleEntryComposer);
-        Composer.VisualSampleEntryComposer = VisualSampleEntryComposer;        
-        var MP4VisualSampleEntryComposer = (function (_super) {
-            __extends(MP4VisualSampleEntryComposer, _super);
-            function MP4VisualSampleEntryComposer(box) {
-                        _super.call(this, box);
+            return VisualSampleEntryBuilder;
+        })(SampleEntryBuilder);
+        Builder.VisualSampleEntryBuilder = VisualSampleEntryBuilder;
+
+        var MP4VisualSampleEntryBuilder = (function (_super) {
+            __extends(MP4VisualSampleEntryBuilder, _super);
+            function MP4VisualSampleEntryBuilder(box) {
+                _super.call(this, box);
                 box.esBox.type = Mp4.BOX_TYPE_ES_DESCRIPTOR_BOX;
                 this.writeBox(box.esBox);
             }
-            MP4VisualSampleEntryComposer.TYPE = Mp4.BOX_TYPE_MP4_VISUAL_SAMPLE_ENTRY;
-            return MP4VisualSampleEntryComposer;
-        })(VisualSampleEntryComposer);
-        Composer.MP4VisualSampleEntryComposer = MP4VisualSampleEntryComposer;        
-        var ESDBoxComposer = (function (_super) {
-            __extends(ESDBoxComposer, _super);
-            function ESDBoxComposer(box) {
-                        _super.call(this, box);
+            MP4VisualSampleEntryBuilder.TYPE = Mp4.BOX_TYPE_MP4_VISUAL_SAMPLE_ENTRY;
+            return MP4VisualSampleEntryBuilder;
+        })(VisualSampleEntryBuilder);
+        Builder.MP4VisualSampleEntryBuilder = MP4VisualSampleEntryBuilder;
+
+        var ESDBoxBuilder = (function (_super) {
+            __extends(ESDBoxBuilder, _super);
+            function ESDBoxBuilder(box) {
+                _super.call(this, box);
                 box.esDescr.tag = Mp4.DESCR_TAG_ES_DESCRIPTOR;
                 this.writeDescriptor(box.esDescr);
             }
-            ESDBoxComposer.TYPE = Mp4.BOX_TYPE_ES_DESCRIPTOR_BOX;
-            return ESDBoxComposer;
-        })(FullBoxComposer);
-        Composer.ESDBoxComposer = ESDBoxComposer;        
-        var AudioSampleEntryComposer = (function (_super) {
-            __extends(AudioSampleEntryComposer, _super);
-            function AudioSampleEntryComposer(box) {
-                        _super.call(this, box);
+            ESDBoxBuilder.TYPE = Mp4.BOX_TYPE_ES_DESCRIPTOR_BOX;
+            return ESDBoxBuilder;
+        })(FullBoxBuilder);
+        Builder.ESDBoxBuilder = ESDBoxBuilder;
+
+        var AudioSampleEntryBuilder = (function (_super) {
+            __extends(AudioSampleEntryBuilder, _super);
+            function AudioSampleEntryBuilder(box) {
+                _super.call(this, box);
                 this.skipBytes(4 * 2);
                 this.writeUint16(box.channelCount);
                 this.writeUint16(box.sampleSize);
@@ -447,56 +472,60 @@ var Mp4;
                 this.skipBytes(2);
                 this.writeUint32(box.sampleRate * 0x10000);
             }
-            return AudioSampleEntryComposer;
-        })(SampleEntryComposer);
-        Composer.AudioSampleEntryComposer = AudioSampleEntryComposer;        
-        var MP4AudioSampleEntryComposer = (function (_super) {
-            __extends(MP4AudioSampleEntryComposer, _super);
-            function MP4AudioSampleEntryComposer(box) {
-                        _super.call(this, box);
+            return AudioSampleEntryBuilder;
+        })(SampleEntryBuilder);
+        Builder.AudioSampleEntryBuilder = AudioSampleEntryBuilder;
+
+        var MP4AudioSampleEntryBuilder = (function (_super) {
+            __extends(MP4AudioSampleEntryBuilder, _super);
+            function MP4AudioSampleEntryBuilder(box) {
+                _super.call(this, box);
                 box.esBox.type = Mp4.BOX_TYPE_ES_DESCRIPTOR_BOX;
                 this.writeBox(box.esBox);
             }
-            MP4AudioSampleEntryComposer.TYPE = Mp4.BOX_TYPE_MP4_AUDIO_SAMPLE_ENTRY;
-            return MP4AudioSampleEntryComposer;
-        })(AudioSampleEntryComposer);
-        Composer.MP4AudioSampleEntryComposer = MP4AudioSampleEntryComposer;        
-        var SampleDescriptionBoxComposer = (function (_super) {
-            __extends(SampleDescriptionBoxComposer, _super);
-            function SampleDescriptionBoxComposer(box) {
+            MP4AudioSampleEntryBuilder.TYPE = Mp4.BOX_TYPE_MP4_AUDIO_SAMPLE_ENTRY;
+            return MP4AudioSampleEntryBuilder;
+        })(AudioSampleEntryBuilder);
+        Builder.MP4AudioSampleEntryBuilder = MP4AudioSampleEntryBuilder;
+
+        var SampleDescriptionBoxBuilder = (function (_super) {
+            __extends(SampleDescriptionBoxBuilder, _super);
+            function SampleDescriptionBoxBuilder(box) {
                 var _this = this;
-                        _super.call(this, box);
+                _super.call(this, box);
                 this.writeUint32(box.entryCount);
                 box.boxes.forEach(function (b) {
                     return _this.writeBox(b);
                 });
             }
-            SampleDescriptionBoxComposer.TYPE = Mp4.BOX_TYPE_SAMPLE_DESCRIPTION_BOX;
-            return SampleDescriptionBoxComposer;
-        })(FullBoxComposer);
-        Composer.SampleDescriptionBoxComposer = SampleDescriptionBoxComposer;        
-        var SampleSizeBoxComposer = (function (_super) {
-            __extends(SampleSizeBoxComposer, _super);
-            function SampleSizeBoxComposer(box) {
+            SampleDescriptionBoxBuilder.TYPE = Mp4.BOX_TYPE_SAMPLE_DESCRIPTION_BOX;
+            return SampleDescriptionBoxBuilder;
+        })(FullBoxBuilder);
+        Builder.SampleDescriptionBoxBuilder = SampleDescriptionBoxBuilder;
+
+        var SampleSizeBoxBuilder = (function (_super) {
+            __extends(SampleSizeBoxBuilder, _super);
+            function SampleSizeBoxBuilder(box) {
                 var _this = this;
-                        _super.call(this, box);
+                _super.call(this, box);
                 this.writeUint32(box.sampleSize);
                 this.writeUint32(box.sampleCount);
-                if(box.sampleSize === 0) {
+                if (box.sampleSize === 0) {
                     box.sampleSizes.forEach(function (size) {
                         return _this.writeUint32(size);
                     });
                 }
             }
-            SampleSizeBoxComposer.TYPE = Mp4.BOX_TYPE_SAMPLE_SIZE_BOX;
-            return SampleSizeBoxComposer;
-        })(FullBoxComposer);
-        Composer.SampleSizeBoxComposer = SampleSizeBoxComposer;        
-        var SampleToChunkBoxComposer = (function (_super) {
-            __extends(SampleToChunkBoxComposer, _super);
-            function SampleToChunkBoxComposer(box) {
+            SampleSizeBoxBuilder.TYPE = Mp4.BOX_TYPE_SAMPLE_SIZE_BOX;
+            return SampleSizeBoxBuilder;
+        })(FullBoxBuilder);
+        Builder.SampleSizeBoxBuilder = SampleSizeBoxBuilder;
+
+        var SampleToChunkBoxBuilder = (function (_super) {
+            __extends(SampleToChunkBoxBuilder, _super);
+            function SampleToChunkBoxBuilder(box) {
                 var _this = this;
-                        _super.call(this, box);
+                _super.call(this, box);
                 this.writeUint32(box.entryCount);
                 box.entries.forEach(function (entry) {
                     _this.writeUint32(entry.firstChunk);
@@ -504,35 +533,37 @@ var Mp4;
                     _this.writeUint32(entry.sampleDescriptionIndex);
                 });
             }
-            SampleToChunkBoxComposer.TYPE = Mp4.BOX_TYPE_SAMPLE_TO_CHUNK_BOX;
-            return SampleToChunkBoxComposer;
-        })(FullBoxComposer);
-        Composer.SampleToChunkBoxComposer = SampleToChunkBoxComposer;        
-        var ChunkOffsetBoxComposer = (function (_super) {
-            __extends(ChunkOffsetBoxComposer, _super);
-            function ChunkOffsetBoxComposer(box) {
+            SampleToChunkBoxBuilder.TYPE = Mp4.BOX_TYPE_SAMPLE_TO_CHUNK_BOX;
+            return SampleToChunkBoxBuilder;
+        })(FullBoxBuilder);
+        Builder.SampleToChunkBoxBuilder = SampleToChunkBoxBuilder;
+
+        var ChunkOffsetBoxBuilder = (function (_super) {
+            __extends(ChunkOffsetBoxBuilder, _super);
+            function ChunkOffsetBoxBuilder(box) {
                 var _this = this;
-                        _super.call(this, box);
+                _super.call(this, box);
                 this.writeUint32(box.entryCount);
                 box.chunkOffsets.forEach(function (offset, i) {
                     return _this.writeUint32(offset);
                 });
             }
-            ChunkOffsetBoxComposer.TYPE = Mp4.BOX_TYPE_CHUNK_OFFSET_BOX;
-            return ChunkOffsetBoxComposer;
-        })(FullBoxComposer);
-        Composer.ChunkOffsetBoxComposer = ChunkOffsetBoxComposer;        
-        var createBoxComposer = function (box) {
-            var _Composer;
-            Object.keys(Mp4.Composer).some(function (key) {
-                if(Mp4.Composer[key].TYPE === box.type) {
-                    _Composer = Mp4.Composer[key];
+            ChunkOffsetBoxBuilder.TYPE = Mp4.BOX_TYPE_CHUNK_OFFSET_BOX;
+            return ChunkOffsetBoxBuilder;
+        })(FullBoxBuilder);
+        Builder.ChunkOffsetBoxBuilder = ChunkOffsetBoxBuilder;
+
+        var createBoxBuilder = function (box) {
+            var _Builder;
+            Object.keys(Mp4.Builder).some(function (key) {
+                if (Mp4.Builder[key].TYPE === box.type) {
+                    _Builder = Mp4.Builder[key];
                     return true;
                 }
             });
-            return new (_Composer || BoxComposer)(box);
+            return new (_Builder || BoxBuilder)(box);
         };
-    })(Mp4.Composer || (Mp4.Composer = {}));
-    var Composer = Mp4.Composer;
+    })(Mp4.Builder || (Mp4.Builder = {}));
+    var Builder = Mp4.Builder;
 })(Mp4 || (Mp4 = {}));
-//@ sourceMappingURL=composer.box.js.map
+//# sourceMappingURL=composer.box.js.map
