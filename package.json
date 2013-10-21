@@ -1,6 +1,6 @@
 {
   "name": "niconico-audio-extractor",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "author": "Syu Kato",
   "devDependencies": {
     "grunt-contrib-copy": "~0.4.1",
