@@ -4,6 +4,7 @@ window.onload = function (e) {
         var progressBar = document.querySelector('progress');
         var progressInfo = document.getElementById('info');
         var pageTitle = bg['pageTitle'];
+
         (bg['downloadType'] === 'movie' ? bg.getMovie : bg.getAudio)({
             pageTitle: bg['pageTitle'],
             pageUrl: bg['pageUrl'],
@@ -23,13 +24,12 @@ window.onload = function (e) {
         }).then(function (media) {
             var a = document.createElement('a');
             var e = document.createEvent('MouseEvent');
+
             a.setAttribute('download', media.name + '.' + media.type);
-            a.setAttribute('href', URL.createObjectURL(new Blob([
-                media.data
-            ])));
+            a.setAttribute('href', URL.createObjectURL(new Blob([media.data])));
             e.initEvent('click', true, true);
             a.dispatchEvent(e);
         });
     });
 };
-//@ sourceMappingURL=downloadhelper.js.map
+//# sourceMappingURL=downloadhelper.js.map

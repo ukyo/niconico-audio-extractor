@@ -1,8 +1,8 @@
 /// <reference path="reference.ts" />
 
 window.onload = e => {
-  chrome.runtime.getBackgroundPage(_ => {
-    var bg = <Background>(<any>_).Background;
+  chrome.runtime.getBackgroundPage((_?: Window) => {
+    var bg = (<any>_).Background;
     var progressBar = <HTMLProgressElement>document.querySelector('progress');
     var progressInfo = document.getElementById('info');
     var pageTitle = bg['pageTitle'];

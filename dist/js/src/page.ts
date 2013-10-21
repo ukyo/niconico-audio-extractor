@@ -4,7 +4,7 @@ window.onload = e => {
   var movieButton = document.getElementById('movie');
   var audioButton = document.getElementById('audio');
 
-  var getCurrentTab = (): Qpromise => {
+  var getCurrentTab = (): Q.Promise<ITabInfo> => {
     var d = Q.defer();
 
     chrome.tabs.query({ active: true }, tabs => {
@@ -18,12 +18,12 @@ window.onload = e => {
     return d.promise;
   };
 
-  var createNotification = (): Qpromise => {
+  var createNotification = (): Q.Promise<chrome.windows.Window> => {
     var d = Q.defer();
     chrome.windows.create({
       type: 'popup',
       url: '/html/downloadhelper.html',
-      width: 420,
+      width: 512,
       height: 160
     }, d.resolve);
     return d.promise;
@@ -31,8 +31,8 @@ window.onload = e => {
 
   var exit = () => chrome.pageAction.hide(null);
 
-  chrome.runtime.getBackgroundPage(_ => {
-    var bg = <Background>(<any>_).Background;
+  chrome.runtime.getBackgroundPage((_?: Window) => {
+    var bg = (<any>_).Background;
 
     movieButton.onclick = e => {
       movieButton.onclick = null;

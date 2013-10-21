@@ -3,6 +3,7 @@ var Flv;
     Flv.TAG_TYPE_AUDIO = 0x08;
     Flv.TAG_TYPE_VIDEO = 0x09;
     Flv.TAG_TYPE_META = 0x12;
+
     Flv.SOUND_FORMAT_LINEAR_PCM_PLATFORM_ENDIAN = 0;
     Flv.SOUND_FORMAT_ADPCM = 1;
     Flv.SOUND_FORMAT_MP3 = 2;
@@ -17,11 +18,13 @@ var Flv;
     Flv.SOUND_FORMAT_SPEEX = 11;
     Flv.SOUND_FORMAT_MP3_8KHZ = 14;
     Flv.SOUND_FORMAT_DEVICE_SPECIFIC_SOUND = 15;
+
     Flv.VIDEO_FRAME_TYPE_KEY_FRAME = 1;
     Flv.VIDEO_FRAME_TYPE_INTER_FRAME = 2;
     Flv.VIDEO_FRAME_TYPE_DISPOSABLE_INTER_FRAME = 3;
     Flv.VIDEO_FRAME_TYPE_GENERATED_KEY_FRAME = 4;
     Flv.VIDEO_FRAME_TYPE_VIDEO_INFO = 5;
+
     Flv.VIDEO_CODEC_ID_JPEG = 1;
     Flv.VIDEO_CODEC_ID_SORENSON_H263 = 2;
     Flv.VIDEO_CODEC_ID_SCREEN_VIDEO = 3;
@@ -29,49 +32,55 @@ var Flv;
     Flv.VIDEO_CODEC_ID_ON2_VP6_WITH_ALPHA_CHANNEL = 5;
     Flv.VIDEO_CODEC_ID_SCREEN_VIDEO_VERSION2 = 6;
     Flv.VIDEO_CODEC_ID_AVC = 7;
+
     Flv.EXTENSION_TABLE = [
-        'wav', 
-        'wav', 
-        'mp3', 
-        'wav', 
-        '', 
-        '', 
-        '', 
-        'wav', 
-        '', 
-        'aac', 
-        'spx', 
-        'mp3', 
+        'wav',
+        'wav',
+        'mp3',
+        'wav',
+        '',
+        '',
+        '',
+        'wav',
+        '',
+        'aac',
+        'spx',
+        'mp3',
         ''
     ];
+
     Flv.SAMPLE_RATE_TABLE = [
-        5512, 
-        11025, 
-        22050, 
+        5512,
+        11025,
+        22050,
         44100
     ];
+
     Flv.AAC_SAMPLE_RATE_TABLE = [
-        96000, 
-        88200, 
-        64000, 
-        48000, 
-        44100, 
-        32000, 
-        24000, 
-        22050, 
-        16000, 
-        12000, 
-        11025, 
+        96000,
+        88200,
+        64000,
+        48000,
+        44100,
+        32000,
+        24000,
+        22050,
+        16000,
+        12000,
+        11025,
         8000
     ];
+
     Flv.SAMPLE_SIZE_TABLE = [
-        8, 
+        8,
         16
     ];
+
     Flv.CHANNELS_TABLE = [
-        1, 
+        1,
         2
     ];
+
     Flv.parse = function (bytes) {
         var reader = new Mp4.BitReader(bytes);
         var header = {
@@ -80,11 +89,13 @@ var Flv;
             flags: reader.readUint8(),
             offset: reader.readUint32()
         };
+
         reader.skipBytes(4);
+
         var tags = [];
-        while(!reader.eof()) {
-            var tag = {
-            };
+
+        while (!reader.eof()) {
+            var tag = {};
             tag.type = reader.readUint8();
             tag.bodyLength = reader.readUint24();
             tag.timeStamp = reader.readUint24();
@@ -94,11 +105,13 @@ var Flv;
             tag.previousTagSize = reader.readUint32();
             tags.push(tag);
         }
+
         return {
             header: header,
             tags: tags
         };
     };
+
     Flv.concatBytes = function (bytess) {
         var n = bytess.map(function (x) {
             return x.length;
@@ -107,17 +120,20 @@ var Flv;
         });
         var ret = new Uint8Array(n);
         var offset = 0;
+
         bytess.forEach(function (bytes) {
             ret.set(bytes, offset);
             offset += bytes.length;
         });
+
         return ret;
     };
+
     var getAudioInfo = function (tree) {
-        var info = {
-        };
+        var info = {};
+
         tree.tags.some(function (tag) {
-            if(tag.type === Flv.TAG_TYPE_AUDIO) {
+            if (tag.type === Flv.TAG_TYPE_AUDIO) {
                 var reader = new Mp4.BitReader(tag.body);
                 info.soundFormat = reader.readBits(4);
                 info.sampleRate = Flv.SAMPLE_RATE_TABLE[reader.readBits(2)];
@@ -126,13 +142,15 @@ var Flv;
                 return true;
             }
         });
+
         return info;
     };
+
     var getAacInfo = function (tree) {
-        var info = {
-        };
+        var info = {};
+
         tree.tags.some(function (tag) {
-            if(tag.type === Flv.TAG_TYPE_AUDIO && tag.body[0] === 0) {
+            if (tag.type === Flv.TAG_TYPE_AUDIO && tag.body[0] === 0) {
                 var reader = new Mp4.BitReader(tag.body.subarray(1));
                 info.type = reader.readBits(5) - 1;
                 info.sampleRateIndex = reader.readBits(4);
@@ -140,13 +158,16 @@ var Flv;
                 return true;
             }
         });
+
         return info;
     };
+
     var getAudioTags = function (tags) {
         return tags.filter(function (tag) {
             return tag.type === Flv.TAG_TYPE_AUDIO;
         });
     };
+
     var extractWave = function (bytes, tree) {
         var writer = new Mp4.BitWriter(true);
         var info = getAudioInfo(tree);
@@ -156,6 +177,7 @@ var Flv;
         }).reduce(function (a, b) {
             return a + b;
         }) - tags.length;
+
         writer.writeString('RIFF');
         writer.writeUint32(bodyLength + 36);
         writer.writeString('WAVE');
@@ -172,11 +194,13 @@ var Flv;
         writer.writeBytes(Flv.concatBytes(tags.map(function (tag) {
             return tag.body.subarray(1);
         })));
+
         return {
             type: 'wav',
             data: writer.data
         };
     };
+
     var extractMp3 = function (bytes, tree) {
         return {
             type: 'mp3',
@@ -185,32 +209,39 @@ var Flv;
             }))
         };
     };
+
     var extractAac = function (bytes, tree) {
         var header = new Uint8Array(7);
         var info = getAacInfo(tree);
         var bytess = [];
+
         header[0] = 0xFF;
         header[1] = 0xF9;
         header[2] = 0x40 | (info.sampleRateIndex << 2) | (info.channels >> 2);
         header[6] = 0xFC;
+
         getAudioTags(tree.tags).forEach(function (tag) {
             var sample = tag.body.subarray(2);
+
             header[3] = (info.channels << 6) | (sample.length - 2 + header.length);
             header[4] = sample.length >> 3;
             header[5] = (sample.length << 5) | (0x7FF >> 6);
+
             var tmp = new Uint8Array(7);
             tmp.set(header);
             bytess.push(tmp);
             bytess.push(sample);
         });
+
         return {
             type: 'aac',
             data: Flv.concatBytes(bytess)
         };
     };
+
     Flv.extractAudio = function (bytes) {
         var tree = Flv.parse(bytes);
-        switch(getAudioInfo(tree).soundFormat) {
+        switch (getAudioInfo(tree).soundFormat) {
             case Flv.SOUND_FORMAT_AAC:
                 return extractAac(bytes, tree);
             case Flv.SOUND_FORMAT_LINEAR_PCM_LITTLE_ENDIAN:
@@ -222,4 +253,4 @@ var Flv;
         }
     };
 })(Flv || (Flv = {}));
-//@ sourceMappingURL=flv.js.map
+//# sourceMappingURL=flv.js.map
