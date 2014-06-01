@@ -1508,9 +1508,9 @@ var Mp4;
 
         Parser.createBoxParser = function (bytes, type) {
             var _Parser;
-            Object.keys(Mp4.Parser).some(function (key) {
-                if (Mp4.Parser[key].TYPE === type) {
-                    _Parser = Mp4.Parser[key];
+            Object.keys(Parser).some(function (key) {
+                if (Parser[key].TYPE === type) {
+                    _Parser = Parser[key];
                     return true;
                 }
             });

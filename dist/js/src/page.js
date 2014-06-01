@@ -32,7 +32,7 @@ window.onload = function (e) {
     };
 
     chrome.runtime.getBackgroundPage(function (_) {
-        var bg = (_).Background;
+        var bg = _.Background;
 
         movieButton.onclick = function (e) {
             movieButton.onclick = null;

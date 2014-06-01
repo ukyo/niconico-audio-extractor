@@ -2,7 +2,7 @@ var Background;
 (function (Background) {
     var getMovieURL = function (pageUrl) {
         var id = pageUrl.split('?')[0].split('/').pop();
-        var xhr = new XMLHttpRequest();
+        var xhr = new XMLHttpRequest;
         var d = Q.defer();
 
         xhr.open('GET', 'http://flapi.nicovideo.jp/api/getflv/' + id + (/^nm/.test(id) ? '?as3=1' : ''));
@@ -17,7 +17,7 @@ var Background;
     };
 
     var loadMovie = function (movieUrl) {
-        var xhr = new XMLHttpRequest();
+        var xhr = new XMLHttpRequest;
         var d = Q.defer();
 
         xhr.open('GET', movieUrl);

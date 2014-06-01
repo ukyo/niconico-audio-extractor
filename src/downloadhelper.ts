@@ -6,7 +6,7 @@ window.onload = e => {
     var progressBar = <HTMLProgressElement>document.querySelector('progress');
     var progressInfo = document.getElementById('info');
     var pageTitle = bg['pageTitle'];
-
+    
     (bg['downloadType'] === 'movie' ? bg.getMovie : bg.getAudio)({
       pageTitle: bg['pageTitle'],
       pageUrl: bg['pageUrl'],
@@ -20,6 +20,7 @@ window.onload = e => {
         return e;
       },
       xhrProgress: e => {
+        if (e.loaded === e.total) return;
         progressBar.value = Math.floor(e.loaded / e.total * 100);
         progressInfo.innerText = 'Now Loading... ' + progressBar.value + '%';
       }
@@ -33,6 +34,9 @@ window.onload = e => {
       a.setAttribute('href', URL.createObjectURL(new Blob([media.data])));
       e.initEvent('click', true, true);
       a.dispatchEvent(e);
+    })
+    .catch(e => {
+      progressInfo.innerText = 'Error: ' + e.message;
     });
   });
 };

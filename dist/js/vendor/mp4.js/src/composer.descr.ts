@@ -20,7 +20,7 @@ module Mp4.Builder {
   export class DescriptorBuilder extends DescriptorBuilderMixin {
     constructor() {
       super();
-      this.writeUint8(this['constructor'].TAG);
+      this.writeUint8((<any>this.constructor).TAG);
       this.writeBytes(new Uint8Array(4));
     }
 

@@ -31,7 +31,7 @@ var Mp4;
             __extends(DescriptorBuilder, _super);
             function DescriptorBuilder() {
                 _super.call(this);
-                this.writeUint8(this['constructor'].TAG);
+                this.writeUint8(this.constructor.TAG);
                 this.writeBytes(new Uint8Array(4));
             }
             DescriptorBuilder.prototype.build = function () {
@@ -162,9 +162,9 @@ var Mp4;
 
         Builder.createDescriptorBuilder = function (descr) {
             var _Builder;
-            Object.keys(Mp4.Builder).some(function (key) {
-                if (Mp4.Builder[key].TAG === descr.tag) {
-                    _Builder = Mp4.Builder[key];
+            Object.keys(Builder).some(function (key) {
+                if (Builder[key].TAG === descr.tag) {
+                    _Builder = Builder[key];
                     return true;
                 }
             });

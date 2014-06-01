@@ -1,6 +1,6 @@
 window.onload = function (e) {
     chrome.runtime.getBackgroundPage(function (_) {
-        var bg = (_).Background;
+        var bg = _.Background;
         var progressBar = document.querySelector('progress');
         var progressInfo = document.getElementById('info');
         var pageTitle = bg['pageTitle'];
@@ -14,10 +14,12 @@ window.onload = function (e) {
                 return movie;
             },
             xhrFail: function (e) {
-                progressInfo.innerText = 'Error: ' + (e.target).status;
+                progressInfo.innerText = 'Error: ' + e.target.status;
                 return e;
             },
             xhrProgress: function (e) {
+                if (e.loaded === e.total)
+                    return;
                 progressBar.value = Math.floor(e.loaded / e.total * 100);
                 progressInfo.innerText = 'Now Loading... ' + progressBar.value + '%';
             }
@@ -29,6 +31,8 @@ window.onload = function (e) {
             a.setAttribute('href', URL.createObjectURL(new Blob([media.data])));
             e.initEvent('click', true, true);
             a.dispatchEvent(e);
+        }).catch(function (e) {
+            progressInfo.innerText = 'Error: ' + e.message;
         });
     });
 };

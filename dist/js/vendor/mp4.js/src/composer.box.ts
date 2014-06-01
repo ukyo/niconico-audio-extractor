@@ -6,7 +6,7 @@ module Mp4.Builder {
     constructor() {
       super();
       this.skipBytes(4);
-      this.writeString(this['constructor'].TYPE);
+      this.writeString((<any>this.constructor).TYPE);
     }
 
     build(): Uint8Array {

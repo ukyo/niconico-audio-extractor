@@ -12,7 +12,7 @@ var Mp4;
             function BoxBuilder() {
                 _super.call(this);
                 this.skipBytes(4);
-                this.writeString(this['constructor'].TYPE);
+                this.writeString(this.constructor.TYPE);
             }
             BoxBuilder.prototype.build = function () {
                 this.view.setUint32(0, this.byteOffset);
@@ -555,9 +555,9 @@ var Mp4;
 
         var createBoxBuilder = function (box) {
             var _Builder;
-            Object.keys(Mp4.Builder).some(function (key) {
-                if (Mp4.Builder[key].TYPE === box.type) {
-                    _Builder = Mp4.Builder[key];
+            Object.keys(Builder).some(function (key) {
+                if (Builder[key].TYPE === box.type) {
+                    _Builder = Builder[key];
                     return true;
                 }
             });

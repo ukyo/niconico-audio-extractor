@@ -5,7 +5,7 @@ module.exports = (grunt) ->
         src: ['dist/js/src/*.ts']
         options:
           target: 'es5'
-          sourcemap: true
+          sourceMap: true
 
     copy:
       base:

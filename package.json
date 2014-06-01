@@ -1,12 +1,12 @@
 {
   "name": "niconico-audio-extractor",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "author": "Syu Kato",
   "devDependencies": {
-    "grunt-contrib-copy": "~0.4.1",
-    "grunt": "~0.4.1",
-    "grunt-typescript": "~0.2.4",
-    "grunt-contrib-clean": "~0.4.1",
-    "grunt-contrib-watch": "~0.4.3"
+    "grunt-contrib-copy": "^0.5.0",
+    "grunt-contrib-clean": "^0.5.0",
+    "grunt-contrib-watch": "^0.6.1",
+    "grunt": "^0.4.5",
+    "grunt-typescript": "^0.3.6"
   }
 }

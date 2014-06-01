@@ -308,8 +308,8 @@ var Mp4;
 
         Parser.createDescriptorParser = function (bytes, tag) {
             var _Parser;
-            Object.keys(Mp4.Parser).some(function (key) {
-                var __Parser = Mp4.Parser[key];
+            Object.keys(Parser).some(function (key) {
+                var __Parser = Parser[key];
                 if (__Parser.TAG === tag || Array.isArray(__Parser) && __Parser.some(function (tag) {
                     return __Parser.TAG === tag;
                 })) {

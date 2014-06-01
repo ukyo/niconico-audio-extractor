@@ -21,7 +21,7 @@ module Background {
   // load movie as Uint8Array.
   var loadMovie = (movieUrl: string): Q.Promise<Uint8Array> => {
     var xhr = new XMLHttpRequest;
-    var d = Q.defer();
+    var d = Q.defer<Uint8Array>();
 
     xhr.open('GET', movieUrl);
     xhr.responseType = 'arraybuffer';
@@ -90,7 +90,7 @@ module Background {
     .then(params.xhrSuccess, params.xhrFail, params.xhrProgress)
     .then((movie: Uint8Array) => {
       var type: string;
-      var d = Q.defer();
+      var d = Q.defer<IMedia>();
 
       var media = {
         type: detectMovieType(movie),
@@ -111,7 +111,7 @@ module Background {
     .then(params.xhrSuccess, params.xhrFail, params.xhrProgress)
     .then((movie: Uint8Array) => {
       var media = extractAudio(movie);
-      var d = Q.defer();
+      var d = Q.defer<IMedia>();
       media.name = params.pageTitle.split(Settings.VIDEO_TITLE_SAFIX)[0];
       setTimeout(_ => d.resolve(media), 0);
       return d.promise;

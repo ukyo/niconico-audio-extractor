@@ -81,6 +81,8 @@ var Flv;
         2
     ];
 
+    
+
     Flv.parse = function (bytes) {
         var reader = new Mp4.BitReader(bytes);
         var header = {

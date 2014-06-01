@@ -5,7 +5,7 @@ window.onload = e => {
   var audioButton = document.getElementById('audio');
 
   var getCurrentTab = (): Q.Promise<ITabInfo> => {
-    var d = Q.defer();
+    var d = Q.defer<ITabInfo>();
 
     chrome.tabs.query({ active: true }, tabs => {
       var current = tabs[0];
@@ -19,7 +19,7 @@ window.onload = e => {
   };
 
   var createNotification = (): Q.Promise<chrome.windows.Window> => {
-    var d = Q.defer();
+    var d = Q.defer<chrome.windows.Window>();
     chrome.windows.create({
       type: 'popup',
       url: '/html/downloadhelper.html',
