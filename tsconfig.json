@@ -1,0 +1,8 @@
+{
+  "compilerOptions": {
+    "moduleResolution": "node",
+    "target": "es2018",
+    "lib": ["dom", "es2018", "es2015.promise"]
+  },
+  "exclude": ["./vendor/mp4.js/src/*.ts", "./vendor/mp4.js/test/*.ts"]
+}

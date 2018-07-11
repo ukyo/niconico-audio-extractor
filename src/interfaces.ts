@@ -1,10 +1,10 @@
-interface IMedia {
+export interface IMedia {
   type: string;
   data: Uint8Array;
   name?: string;
 }
 
-interface IDownloadParams {
+export interface IDownloadParams {
   pageUrl: string;
   pageTitle: string;
   xhrSuccess(movie: Uint8Array): Uint8Array;
@@ -12,7 +12,7 @@ interface IDownloadParams {
   xhrProgress(ev: ProgressEvent): ProgressEvent;
 }
 
-interface ITabInfo {
+export interface ITabInfo {
   url: string;
   title: string;
 }
