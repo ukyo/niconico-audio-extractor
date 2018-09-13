@@ -5,24 +5,17 @@ import * as Flv from "./flv";
 import { VIDEO_TITLE_SAFIX } from "./settings";
 
 namespace Background {
-  // get a raw movie url with nicovideo api.
-  const getMovieURL = async (pageUrl: string) => {
-    var id = pageUrl
-      .split("?")[0]
-      .split("/")
-      .pop();
+  export var movieUrl: string;
 
-    return new Promise<string>((resolve, reject) => {
-      var xhr = new XMLHttpRequest();
-      xhr.open(
-        "GET",
-        `http://flapi.nicovideo.jp/api/getflv/${id +
-          (/^nm/.test(id) ? "?as3=1" : "")}`
+  // get a raw movie url with nicovideo api.
+  export const getMovieURL = (pageUrl: string) => {
+    return new Promise(resolve => {
+      chrome.tabs.executeScript(
+        {
+          code: `document.querySelector("#MainVideoPlayer video").src;`
+        },
+        resolve
       );
-      xhr.onload = e =>
-        resolve(decodeURIComponent(/url=([^&]+)/.exec(xhr.responseText)[1]));
-      xhr.onerror = reject;
-      xhr.send();
     });
   };
 
@@ -101,8 +94,7 @@ namespace Background {
 
   // get a movie data from nicovideo.
   export const getMovie = async (params: IDownloadParams): Promise<IMedia> => {
-    const movieURL = await getMovieURL(params.pageUrl);
-    const x = loadMovie(movieURL);
+    const x = loadMovie(Background.movieUrl);
     x.onProgress(params.xhrProgress);
     const movie = (await x.promise.then(
       params.xhrSuccess,
@@ -118,8 +110,7 @@ namespace Background {
 
   // get a audio data from nicovideo.
   export const getAudio = async (params: IDownloadParams): Promise<IMedia> => {
-    const movieUrl = await getMovieURL(params.pageUrl);
-    const x = loadMovie(movieUrl);
+    const x = loadMovie(Background.movieUrl);
     x.onProgress(params.xhrProgress);
     const movie = (await x.promise.then(
       params.xhrSuccess,

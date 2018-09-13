@@ -5,7 +5,7 @@ window.onload = e => {
   var audioButton = document.getElementById("audio");
 
   var getCurrentTab = () => {
-    return new Promise(resolve => {
+    return new Promise<ITabInfo>(resolve => {
       chrome.tabs.query({ active: true }, tabs => {
         var current = tabs[0];
         resolve({
@@ -35,30 +35,28 @@ window.onload = e => {
   chrome.runtime.getBackgroundPage((_?: Window) => {
     var bg = (<any>_).Background;
 
-    movieButton.onclick = e => {
+    movieButton.onclick = async e => {
       movieButton.onclick = null;
       audioButton.onclick = null;
-      getCurrentTab()
-        .then((tabInfo: ITabInfo) => {
-          bg["pageUrl"] = tabInfo.url;
-          bg["pageTitle"] = tabInfo.title;
-          bg["downloadType"] = "movie";
-        })
-        .then(createNotification)
-        .then(exit);
+      bg["movieUrl"] = await bg.getMovieURL();
+      const tabInfo = await getCurrentTab();
+      bg["pageUrl"] = tabInfo.url;
+      bg["pageTitle"] = tabInfo.title;
+      bg["downloadType"] = "movie";
+      await createNotification();
+      exit();
     };
 
-    audioButton.onclick = e => {
+    audioButton.onclick = async e => {
       movieButton.onclick = null;
       audioButton.onclick = null;
-      getCurrentTab()
-        .then((tabInfo: ITabInfo) => {
-          bg["pageUrl"] = tabInfo.url;
-          bg["pageTitle"] = tabInfo.title;
-          bg["downloadType"] = "audio";
-        })
-        .then(createNotification)
-        .then(exit);
+      bg["movieUrl"] = await bg.getMovieURL();
+      const tabInfo = await getCurrentTab();
+      bg["pageUrl"] = tabInfo.url;
+      bg["pageTitle"] = tabInfo.title;
+      bg["downloadType"] = "audio";
+      await createNotification();
+      exit();
     };
   });
 };
