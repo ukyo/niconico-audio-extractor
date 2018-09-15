@@ -1,8 +1,8 @@
 <html>
+
 <head>
   <title>play ground</title>
   <script src="../dist/js/vendor/zlib.js/bin/inflate.min.js"></script>
-  <script src="../dist/js/vendor/q/q.min.js"></script>
   <script src="../dist/js/vendor/mp4.js/src/statics.js"></script>
   <script src="../dist/js/vendor/mp4.js/src/dataview.js"></script>
   <script src="../dist/js/vendor/mp4.js/src/bitreader.js"></script>
@@ -18,28 +18,32 @@
   <script src="../dist/js/src/flv.js"></script>
   <script src="../dist/js/src/swf.js"></script>
 </head>
+
 <body>
   <h1>Open the console and try scripts!</h1>
-  <p>If drop a file to this window, it set to <code>window.data</code> as <code>Uint8Array</code>.</p>
+  <p>If drop a file to this window, it set to
+    <code>window.data</code> as
+    <code>Uint8Array</code>.</p>
   <script>
-    window.onload = function() {
+    window.onload = function () {
       function cancel(e) {
         e.preventDefault();
       }
 
       window.addEventListener('dragenter', cancel, false);
       window.addEventListener('dragover', cancel, false);
-      window.addEventListener('drop', function(e) {
+      window.addEventListener('drop', function (e) {
         cancel(e);
 
         var file = e.dataTransfer.files[0];
         var reader = new FileReader();
         reader.readAsArrayBuffer(file);
-        reader.onload = function() {
+        reader.onload = function () {
           window.data = new Uint8Array(reader.result);
         };
       });
     }
   </script>
 </body>
+
 </html>

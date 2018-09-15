@@ -2,8 +2,9 @@ module.exports = {
   mode: "development",
   entry: {
     background: "./src/background.ts",
-    downloadhelper: "./src/downloadhelper.ts",
-    page: "./src/page.ts"
+    page: "./src/page.ts",
+    extractmovie: "./src/extractmovie.ts",
+    extractaudio: "./src/extractaudio.ts"
   },
   output: {
     filename: "[name].js",

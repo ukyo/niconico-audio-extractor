@@ -2,10 +2,28 @@
 
 extract audio from nicovideo.com
 
-# build
+# Development
+
+Clone this repository.
 
 ```
-npm install -g grunt
-npm isntall
-grunt
+$ git clone https://github.com/ukyo/niconico-audio-extractor.git --recursive
+```
+
+Initialize dev dependencies with `yarn`.
+
+```
+$ yarn
+```
+
+Build with `yarn build`.
+
+```
+$ yarn build
+```
+
+You can add the `-w` option. Then, that command will start as watch mode.
+
+```
+$ yarn build -w
 ```
