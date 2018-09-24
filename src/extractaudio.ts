@@ -43,7 +43,7 @@ const extractAudio = (movie: Uint8Array): IMedia => {
 
 (async () => {
   const movie = await download();
-  const media = extractAudio(movie);
-  media.name = document.title.split(VIDEO_TITLE_SAFIX)[0];
-  save(media);
+  // const media = extractAudio(movie);
+  // media.name = document.title.split(VIDEO_TITLE_SAFIX)[0];
+  // save(media);
 })();
