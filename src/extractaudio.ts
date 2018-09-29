@@ -5,7 +5,11 @@ import * as Swf from "./swf";
 import * as Flv from "./flv";
 import { VIDEO_TITLE_SAFIX } from "./settings";
 import { Mp4 } from "../vendor/mp4.js/dist";
-import { download } from "./helpers/download";
+import {
+  download,
+  isBlobUrl,
+  extractAudioForLoggedInUser
+} from "./helpers/download";
 import { save } from "./helpers/save";
 
 const extractAudio = (movie: Uint8Array): IMedia => {
@@ -42,8 +46,16 @@ const extractAudio = (movie: Uint8Array): IMedia => {
 };
 
 (async () => {
-  const movie = await download();
-  // const media = extractAudio(movie);
-  // media.name = document.title.split(VIDEO_TITLE_SAFIX)[0];
-  // save(media);
+  if (isBlobUrl()) {
+    save({
+      type: "m4a",
+      data: await extractAudioForLoggedInUser(),
+      name: document.title.split(VIDEO_TITLE_SAFIX)[0]
+    });
+  } else {
+    const movie = await download();
+    const media = extractAudio(movie);
+    media.name = document.title.split(VIDEO_TITLE_SAFIX)[0];
+    save(media);
+  }
 })();
