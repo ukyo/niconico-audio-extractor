@@ -93,7 +93,7 @@
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-eval("window.onload = e => {\n    const movieButton = document.getElementById(\"movie\");\n    const audioButton = document.getElementById(\"audio\");\n    const exit = () => chrome.pageAction.hide(null);\n    chrome.runtime.getBackgroundPage((_) => {\n        var bg = _.Background;\n        movieButton.onclick = async (e) => {\n            bg.extractMovie();\n            exit();\n        };\n        audioButton.onclick = async (e) => {\n            bg.extractAudio();\n            exit();\n        };\n    });\n};\n\n\n//# sourceURL=webpack:///./src/page.ts?");
+eval("window.onload = e => {\n    const movieButton = document.getElementById(\"movie\");\n    const audioButton = document.getElementById(\"audio\");\n    const exit = () => window.close();\n    chrome.runtime.getBackgroundPage((_) => {\n        var bg = _.Background;\n        // movieButton.onclick = async e => {\n        //   bg.extractMovie();\n        //   exit();\n        // };\n        audioButton.onclick = async (e) => {\n            bg.extractAudio();\n            exit();\n        };\n    });\n};\n\n\n//# sourceURL=webpack:///./src/page.ts?");
 
 /***/ })
 

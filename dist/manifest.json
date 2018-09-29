@@ -1,6 +1,6 @@
 {
   "name": "NicoNico Audio Extractor",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "manifest_version": 2,
   "description": "ニコニコ動画から音声を抽出して保存します。",
   "icons": {
@@ -8,8 +8,7 @@
     "128": "img/128.png"
   },
   "background": {
-    "scripts": ["js/background.js"],
-    "persistent": false
+    "page": "html/bg.html"
   },
   "page_action": {
     "default_icon": {
@@ -20,10 +19,11 @@
     "default_popup": "html/page.html"
   },
   "permissions": [
-    "https://*.dmc.nico/*",
-    "http://*.nicovideo.jp/*",
+    "webRequest",
     "tabs",
-    "activeTab"
+    "activeTab",
+    "https://*.dmc.nico/*",
+    "http://*.nicovideo.jp/*"
   ],
   "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'"
 }
